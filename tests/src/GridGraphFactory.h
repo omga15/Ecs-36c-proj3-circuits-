@@ -7,7 +7,7 @@ template <typename T>
 struct SGridGraphFactory;
 
 template<>
-struct SGridGraphFactory<YOUR_GRAPH_HERE> {
+struct SGridGraphFactory<YOUR_GRAPH_HERE > {
     static std::unique_ptr<CGraph> Create(
         TGridCoordinate width,
         TGridCoordinate height,

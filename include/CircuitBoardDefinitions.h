@@ -12,7 +12,7 @@ struct SCircuitLocation{
     TCircuitCoordinate DX;
     TCircuitCoordinate DY;
 
-    int operator<=>(const SCircuitLocation &) const = default;
+    auto operator<=>(const SCircuitLocation &) const = default;
 };
 
 struct SCircuitBoardLocation{
