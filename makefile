@@ -24,16 +24,20 @@ TEST_CPPFLAGS		= $(TEST_CFLAGS) $(CPPFLAGS) -fno-inline -ftest-coverage -g --cov
 TEST_LDFLAGS		= -lgtest -lgtest_main -lpthread
 # current files
 
-TEST_CIRCUIT_TRACE_OBJ_TEST = $(TESTS_OBJ_DIR)/CircuitTraceTest.o
+TEST_CIRCUIT_TRACE_OBJ_TEST 	= $(TESTS_OBJ_DIR)/CircuitTraceTest.o
 
-TEST_CIRCUIT_TARGET 		= $(TESTS_BIN_DIR)/testcircuit
+TEST_CIRCUIT_TRACE_TARGET 		= $(TESTS_BIN_DIR)/testtrace
 
-TEST_MAP_OBJ_FILES			= $(TESTS_OBJ_DIR)/GraphTest.o	\
-								$(TESTS_OBJ_DIR)/gridGraphTest.o \ 
-								$(TESTS_OBJ_DIR)/MutapleGraphTest.o
+TEST_CIRCUIT_NET_OBJ_TEST 		= $(TESTS_OBJ_DIR)/CircuitNetTest.o
+
+TEST_CIRCUIT_NET_TARGET 		= $(TESTS_BIN_DIR)/testnet
+
+TEST_GRAPH_OBJ_FILES			= $(TESTS_OBJ_DIR)/GraphTest.o	\
+									$(TESTS_OBJ_DIR)/GridGraphTest.o 
 								
-TEST_MAP_TARGET				= $(TESTS_BIN_DIR)/testgraph
+TEST_GRAPH_TARGET				= $(TESTS_BIN_DIR)/testgraph
 
+TEST_MUTABLE_GRAPH_OBJ_
 # prev files
 
 TEST_UNION_FIND_OBJ_FILES	= $(TESTS_OBJ_DIR)/UnionFindTest.o 			\
@@ -104,6 +108,17 @@ generate_coverage:
 $(ANALYSIS_TARGET): $(ANALYSIS_OBJ_FILES)
 	$(CXX) $(CPPFLAGS) $(ANALYSIS_OBJ_FILES) $(LDFLAGS) -o $@
 
+## New
+$(TEST_GRAPH_TARGET): $(TEST_GRAPH_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@
+	
+$(TEST_CIRCUIT_TRACE_TARGET): $(TEST_CIRCUIT_TRACE_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@
+
+$(TEST_CIRCUIT_NET_TARGET): $(TEST_CIRCUIT_NET_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@
+
+## old
 $(TEST_UNION_FIND_TARGET): $(TEST_UNION_FIND_OBJ_FILES)
 	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@
 

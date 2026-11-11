@@ -39,7 +39,7 @@ protected:
 
 // Replace with your concrete graph implementation(s).
 using GraphImplementations = ::testing::Types<
-    YOUR_GRAPH_HERE
+    CAdjacencyListGraph
 >;
 
 TYPED_TEST_SUITE(GraphInterfaceTest, GraphImplementations);

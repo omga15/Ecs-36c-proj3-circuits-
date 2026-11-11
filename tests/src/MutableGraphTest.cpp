@@ -40,7 +40,7 @@ protected:
 
 // Replace CYourGraphImplementation with your concrete implementation types.
 using MutableGraphImplementations =
-    ::testing::Types<YOUR_GRAPH_HERE>;
+    ::testing::Types<CAdjacencyListGraph>;
 
 TYPED_TEST_SUITE(
     MutableGraphInterfaceTest,
