@@ -1,62 +1,133 @@
-#include <memory>
-#include <vector>
 #include "CircuitNet.h"
 
-struct CircuitNet::SImplementation{
-    std::vector<>
-    mutable std::vector<SCircuitLocation> Location;
+
+struct CCircuitNet::SImplementation{
 
     TCircuitName Name() const{
-
+        return TCircuitName();
     }
-    TCircuitName Name(const TCircuitName &name){
 
+    TCircuitName Name(const TCircuitName &name){
+        return TCircuitName();
     }
 
     std::size_t PinCount() const{
-
+        return 0;
     }
-    SCircuitLocation PinLocation(std::size_t index) const{
 
+    bool PinLocation(std::size_t index, SCircuitLocation &location) const{
+        return false;
     }
+
     bool AddPinLocation(const SCircuitLocation &location){
-
+        return false;
     }
 
-    std::size_t TraceCount() const;
-    CCircuitTrace Trace(std::size_t index) const;
-        
+    std::size_t TraceCount() const{
+        return 0;
+    }
+
+    bool Trace(std::size_t index, CCircuitTrace &trace) const{
+        return false;
+    }
+
+    bool AddTrace(const CCircuitTrace &trace){
+        return false;
+    }
+
+    bool IsBroken() const{
+        return false;
+    }
+
+    bool Fix(){
+        return false;
+    }
+
+    bool SimplifyTraces(){
+        return false;
+    }
+
+    bool ElaborateTraces(){
+        return false;
+    }
 };
 
-CCircuitNet::CCircuitNet(){
-    Dimplmentation = std::make_unique<SImplementation>();
+CCircuitNet::CCircuitNet() : DImplementation(std::make_unique<SImplementation>()){
 }
 
-CCircuitNet::~CCircuitNet(){
-
+CCircuitNet::CCircuitNet(const CCircuitNet &net)
+    : DImplementation(std::make_unique<SImplementation>(*net.DImplementation)){
 }
 
+CCircuitNet::CCircuitNet(CCircuitNet &&net) noexcept = default;
 
-TCircuitName CCircuitNet CCircuitNet Name() const{
-    return Dimplmentation->Name();
+CCircuitNet::~CCircuitNet() = default;
+
+CCircuitNet &CCircuitNet::operator=(const CCircuitNet &net){
+    if(this != &net){
+        *DImplementation = *net.DImplementation;
+    }
+    return *this;
 }
 
-std::size_t CCircuitNet PinCount() noexcept{
-    return Dimplmentation->PinCount();
+CCircuitNet &CCircuitNet::operator=(CCircuitNet &&net) noexcept = default;
+
+// Returns the name of the circuit associated with this net.
+TCircuitName CCircuitNet::Name() const{
+    return DImplementation->Name();
 }
 
-SCircuitLocation CCircuitNet PinLocation(std::size_t index){
-    return Dimplmentation->Pinlocation(index);
+// Sets the name of the circuit associated with this net.
+TCircuitName CCircuitNet::Name(const TCircuitName &name){
+    return DImplementation->Name(name);
 }
 
-bool CCircuitNet AddPinLocation(const SCircuitLocation &location){
-    return Dimplementation->AddPinLocation(location);
+// Returns the total number of pin locations in the net.
+std::size_t CCircuitNet::PinCount() const{
+    return DImplementation->PinCount();
 }
 
-std::size_t CCircuitNet TraceCount(){
-   return Dimplementation->TraceCount(); 
+// Gets the pin location at the specified index.
+bool CCircuitNet::PinLocation(std::size_t index, SCircuitLocation &location) const{
+    return DImplementation->PinLocation(index,location);
 }
 
-CCircuitTrace CCircuitNet Trace(std::size_t index) const{
-    return Dimplementation->Trace(index);
+// Adds a pin location to the net.
+bool CCircuitNet::AddPinLocation(const SCircuitLocation &location){
+    return DImplementation->AddPinLocation(location);
+}
+
+// Returns the total number of traces in the net.
+std::size_t CCircuitNet::TraceCount() const{
+    return DImplementation->TraceCount();
+}
+
+// Gets the trace at the specified index.
+bool CCircuitNet::Trace(std::size_t index, CCircuitTrace &trace) const{
+    return DImplementation->Trace(index,trace);
+}
+
+// Adds a trace to the net.
+bool CCircuitNet::AddTrace(const CCircuitTrace &trace){
+    return DImplementation->AddTrace(trace);
+}
+
+// Checks whether the net contains broken or disconnected connections.
+bool CCircuitNet::IsBroken() const{
+    return DImplementation->IsBroken();
+}
+
+// Attempts to repair broken connections in the net.
+bool CCircuitNet::Fix(){
+    return DImplementation->Fix();
+}
+
+// Simplifies all traces contained in the net.
+bool CCircuitNet::SimplifyTraces(){
+    return DImplementation->SimplifyTraces();
+}
+
+// Expands all traces contained in the net into more detailed representations.
+bool CCircuitNet::ElaborateTraces(){
+    return DImplementation->ElaborateTraces();
 }
