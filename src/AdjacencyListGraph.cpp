@@ -1,5 +1,7 @@
 #include "AdjacencyListGraph.h"
 #include <vector>
+#include <deque>
+#include <iostream>
 
 struct CAdjacencyListGraph::SImplementation{
     struct SEdge{
@@ -14,8 +16,10 @@ struct CAdjacencyListGraph::SImplementation{
 
     std::vector<SVertex> DVertices;
     std::vector<bool> DDeleted;
+    std::size_t DDeleteCount;
 
     SImplementation(const std::vector<CGraph::TVertexTag> &tags,const std::vector<std::tuple<CGraph::TVertexID, CGraph::TVertexID, double, bool>>& edges){
+        DDeleteCount = 0;
         for(auto &Tag : tags){
             AddVertex(Tag);
         }
@@ -30,7 +34,7 @@ struct CAdjacencyListGraph::SImplementation{
 
     // Returns the total number of vertices in the graph.
     std::size_t VertexCount() const noexcept{
-        return DVertices.size();
+        return DVertices.size() - DDeleteCount;
     }
 
     // Gets the tag associated with a vertex.
@@ -91,28 +95,76 @@ struct CAdjacencyListGraph::SImplementation{
     // Performs an unweighted breadth-first search starting at the specified vertex.
     // Calls the callback for each visited vertex.
     void BreadthFirstSearchUnweighted(TVertexID start, const TTraversalFunction &callback) const noexcept{
-
+        std::deque<TVertexID> Horizon;
+        std::vector<bool> Visited(DVertices.size(),false);
+        std::vector<std::size_t> Depth(DVertices.size(),0);
+        std::vector<TVertexID> Parent(DVertices.size(),VertexIDInvalid);
+        if(VertexIDIsValid(start)){
+            Horizon.push_back(start);
+            Visited[start] = true;
+            while(!Horizon.empty()){
+                auto Current = Horizon.front();
+                Horizon.pop_front();
+                auto CurrentDepth = Depth[Current];
+                auto CurrentParent = Parent[Current];
+                auto Control = callback(Current,CurrentParent,CurrentDepth,std::numeric_limits<double>::quiet_NaN());
+                if(Control == EGraphTraversal::Continue){
+                    // add neighbors
+                    for(auto &Edge : DVertices[Current].DEdges){
+                        if(VertexIDIsValid(Edge.DDestination) && !Visited[Edge.DDestination]){
+                            Visited[Edge.DDestination] = true;
+                            Horizon.push_back(Edge.DDestination);
+                            Parent[Edge.DDestination] = Current;
+                            Depth[Edge.DDestination] = CurrentDepth + 1;
+                        }
+                    }
+                }
+                else if(Control == EGraphTraversal::Stop){
+                    break;
+                }
+            }
+        }
     }
 
+
+    bool DepthFirstSearchInternal(TVertexID id, TVertexID parent, std::size_t depth, std::vector<bool> &visited, const TTraversalFunction &callback) const noexcept{
+        visited[id] = true;
+        auto Control = callback(id,parent,depth,std::numeric_limits<double>::quiet_NaN());
+        if(Control == EGraphTraversal::Continue){
+            for(auto &Edge : DVertices[id].DEdges){
+                if(VertexIDIsValid(Edge.DDestination) && !visited[Edge.DDestination]){
+                    if(!DepthFirstSearchInternal(Edge.DDestination,id,depth+1,visited,callback)){
+                        return false;
+                    }
+                }
+            }
+        }
+        else if(Control == EGraphTraversal::Stop){
+            return false;
+        }
+        return true;
+    }
 
     // Performs a depth-first search starting at the specified vertex.
     // Calls the callback for each visited vertex.
     void DepthFirstSearch(TVertexID start, const TTraversalFunction &callback) const noexcept{
-
+        std::vector<bool> Visited(DVertices.size(),false);
+        DepthFirstSearchInternal(start,VertexIDInvalid,0,Visited,callback);
     }
 
 
     // Performs a weighted breadth-first search starting at the specified vertex.
     // Returns true if the search completes successfully.
     bool BreadthFirstSearchWeighted(TVertexID start, const TTraversalFunction &callback) const noexcept{
-
+        
+        return false;
     }
 
 
     // Visits every vertex in the graph, calling the callback for each one.
     // Returns true if the traversal completes successfully.
     bool ForEach(const TTraversalFunction &callback) const noexcept{
-
+        return true;
     }
 
 
@@ -132,6 +184,7 @@ struct CAdjacencyListGraph::SImplementation{
     bool RemoveVertex(TVertexID id) noexcept{
         if(VertexIDIsValid(id)){
             DDeleted[id] = true;
+            DDeleteCount++;
             return true;
         }
         return false;
@@ -168,14 +221,30 @@ struct CAdjacencyListGraph::SImplementation{
     // Removes the edge between two vertices.
     // Returns true if the edge was successfully removed.
     bool RemoveEdge(TVertexID src, TVertexID dest) noexcept{
-
+        if(VertexIDIsValid(src) && VertexIDIsValid(dest)){
+            for(std::size_t Index = 0; Index < DVertices[src].DEdges.size(); Index++){
+                if(DVertices[src].DEdges[Index].DDestination == dest){
+                    DVertices[src].DEdges.erase(DVertices[src].DEdges.begin() + Index);
+                    return true;
+                } 
+            }
+        }
+        return false;
     }
 
 
     // Changes the weight of an existing edge.
     // Returns true if the edge exists and its weight was updated.
     bool SetEdgeWeight(TVertexID src, TVertexID dest, double weight) noexcept{
-
+        if(VertexIDIsValid(src) && VertexIDIsValid(dest)){
+            for(auto &Edge : DVertices[src].DEdges){
+                if(Edge.DDestination == dest){
+                    Edge.DWeight = weight;
+                    return true;
+                } 
+            }
+        }
+        return false;
     }
 
 
