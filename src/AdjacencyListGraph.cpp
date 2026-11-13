@@ -1,7 +1,9 @@
 #include "AdjacencyListGraph.h"
 #include <vector>
 #include <deque>
-#include <iostream>
+#include <queue>
+#include <functional>
+
 
 struct CAdjacencyListGraph::SImplementation{
     struct SEdge{
@@ -157,6 +159,16 @@ struct CAdjacencyListGraph::SImplementation{
     // Returns true if the search completes successfully.
     bool BreadthFirstSearchWeighted(TVertexID start, const TTraversalFunction &callback) const noexcept{
         
+        // Initialize arrays (priority queue, as well?) (Store distance and vertex ids as pairs)
+        
+        // Mark distance to the starting vertex as 0 (it is already found)
+
+        // Loop while the queue is not empty, adjusting the distance if a shorter one is found
+
+        // Push neighbors into the queue with their current distance (the priority queue will handle sorting them)
+
+        // Repeat with the next vertex in the priority queue
+
         return false;
     }
 
@@ -164,7 +176,18 @@ struct CAdjacencyListGraph::SImplementation{
     // Visits every vertex in the graph, calling the callback for each one.
     // Returns true if the traversal completes successfully.
     bool ForEach(const TTraversalFunction &callback) const noexcept{
+
+        // Traverse each vertex, and call the callback function on it.
+       for(std::size_t i = 0; i < DVertices.size(); i++) {
+
+            auto Control = callback(i, i, 0, std::numeric_limits<double>::quiet_NaN());
+
+            if(Control == EGraphTraversal::Stop) return false;
+
+       }
+
         return true;
+
     }
 
 
