@@ -3,39 +3,65 @@
 
 struct CCircuitTrace::SImplementation{
 
+    // Starting location of the edge.
+    SCircuitLocation DSource;
+
+    // Ending location of the edge.
+    SCircuitLocation DDestination;
+    std::vector<SCircuitTraceEdge> DEdge;
+    std::vector<SCircuitBoardLocation> DLocation;
+
+    //name of circuit
+    TCircuitName DName = ""; 
+
     TCircuitName Name() const{
-        return TCircuitName();
+        return DName;
     }
 
-    TCircuitName Name(const TCircuitName &name){
-        return TCircuitName();
+    TCircuitName Name(const TCircuitName &name){ // a little bit of hard coding
+        if (name == "")
+        {
+            return DName;
+        }
+        DName = name;
+        return DName;
     }
 
     std::size_t LocationCount() const{
-        return 0;
+        return DLocation.size();
     }
 
-    bool Location(std::size_t index, SCircuitLocation &location) const{
+    bool Location(std::size_t index, SCircuitLocation &location) const{ // gets the location using index and stores in location???
+        if(index > LocationCount()){
+            location = DLocation[index].DLocation;
+            return true;
+        }
         return false;
     }
 
     std::size_t EdgeCount() const{
-        return 0;
+        return DEdge.size();
     }
 
     bool Edge(std::size_t index, SCircuitTraceEdge &edge) const{
+        if(index > EdgeCount()){
+            edge = DEdge[index];
+            return true;
+        }
         return false;
     }
 
-    bool SourceDestinationAsEdge(SCircuitTraceEdge &edge) const{
+    bool SourceDestinationAsEdge(SCircuitTraceEdge &edge) const{ //where do i return this??
         return false;
     }
 
     bool AddEdge(const SCircuitTraceEdge &edge){
-        return false;
+        DEdge.push_back(edge);
+        return true;
     }
 
     bool ConcatenateTrace(const CCircuitTrace &trace){
+        
         return false;
     }
 
@@ -59,8 +85,7 @@ struct CCircuitTrace::SImplementation{
 CCircuitTrace::CCircuitTrace() : DImplementation(std::make_unique<SImplementation>()){
 }
 
-CCircuitTrace::CCircuitTrace(const CCircuitTrace &trace)
-    : DImplementation(std::make_unique<SImplementation>(*trace.DImplementation)){
+CCircuitTrace::CCircuitTrace(const CCircuitTrace &trace) : DImplementation(std::make_unique<SImplementation>(*trace.DImplementation)){
 }
 
 CCircuitTrace::CCircuitTrace(CCircuitTrace &&trace) noexcept = default;

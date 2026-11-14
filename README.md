@@ -1,6 +1,6 @@
 # Project X README
 
-Student 1: Partner1 Name (123456789)
+Student 1: Patrick Wang (924885084)
 
 Student 2: Partner2 Name (123456987)
 
@@ -11,8 +11,17 @@ This the current status of the project ...
 The project fails to function properly in ...
 
 ## Code References
-* [Different ways to initialize variables](https://stackoverflow.com/questions/22543875/different-ways-to-initialize-variables)
-* [Some other link](https://stackoverflow.com)
+* [Dijka's algorithm](https://graphisual.app/algorithm/dijkstra)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
+* [______](____________)
 
 ## Generative AI Use
 I used ChatGPT for Prompt 1, and ZZZZZ for Prompt 2....

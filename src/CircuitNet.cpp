@@ -2,24 +2,36 @@
 
 
 struct CCircuitNet::SImplementation{
+    TCircuitName DName; 
+    
+    struct Pins{
+        SCircuitLocation DDestination;
+    };
+
+    std::vector<Pins> DPin;
+    std::vector<bool> DDelete;
 
     TCircuitName Name() const{
-        return TCircuitName();
+        return DName;
     }
 
     TCircuitName Name(const TCircuitName &name){
-        return TCircuitName();
+        return DName = name;
     }
 
     std::size_t PinCount() const{
-        return 0;
+        return DPin.size();
     }
 
     bool PinLocation(std::size_t index, SCircuitLocation &location) const{
+        if(index >= DPin.size()){
+            location = DPin[index].DDestination;
+        }       
         return false;
     }
 
     bool AddPinLocation(const SCircuitLocation &location){
+        
         return false;
     }
 
@@ -52,16 +64,17 @@ struct CCircuitNet::SImplementation{
     }
 };
 
-CCircuitNet::CCircuitNet() : DImplementation(std::make_unique<SImplementation>()){
+CCircuitNet::CCircuitNet(){
+    DImplementation = std::make_unique<SImplementation>();
 }
 
-CCircuitNet::CCircuitNet(const CCircuitNet &net)
-    : DImplementation(std::make_unique<SImplementation>(*net.DImplementation)){
+CCircuitNet::CCircuitNet(const CCircuitNet &net){
+    DImplementation = std::make_unique<SImplementation>(*net.DImplementation);
 }
 
 CCircuitNet::CCircuitNet(CCircuitNet &&net) noexcept = default;
 
-CCircuitNet::~CCircuitNet() = default;
+CCircuitNet::~CCircuitNet(){}
 
 CCircuitNet &CCircuitNet::operator=(const CCircuitNet &net){
     if(this != &net){

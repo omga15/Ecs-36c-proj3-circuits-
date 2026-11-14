@@ -39,7 +39,8 @@ TEST_CIRCUIT_TRACE_OBJ_FILES 	= $(TESTS_OBJ_DIR)/CircuitTrace.o 				\
 						
 TEST_CIRCUIT_TRACE_TARGET 		= $(TESTS_BIN_DIR)/testtrace
 
-TEST_CIRCUIT_NET_OBJ_FILES 		= $(TESTS_OBJ_DIR)/CircuitNet.o					\
+TEST_CIRCUIT_NET_OBJ_FILES 		= $(TESTS_OBJ_DIR)/CircuitTrace.o \
+									$(TESTS_OBJ_DIR)/CircuitNet.o \
 									$(TESTS_OBJ_DIR)/CircuitNetTest.o
 
 TEST_CIRCUIT_NET_TARGET 		= $(TESTS_BIN_DIR)/testnet
