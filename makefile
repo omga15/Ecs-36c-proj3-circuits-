@@ -25,12 +25,14 @@ TEST_LDFLAGS		= -lgtest -lgtest_main -lpthread
 
 
 TEST_GRAPH_OBJ_FILES		= $(TESTS_OBJ_DIR)/AdjacencyListGraph.o 			\
+							  $(TESTS_OBJ_DIR)/VariableSizeDeque.o				\
 						  	  $(TESTS_OBJ_DIR)/GraphTest.o 	
 
 TEST_GRAPH_TARGET			= $(TESTS_BIN_DIR)/testgraph
 
 TEST_MUTABLE_GRAPH_OBJ_FILES	= $(TESTS_OBJ_DIR)/AdjacencyListGraph.o 		\
-						  	  		$(TESTS_OBJ_DIR)/MutableGraphTest.o 	
+								  $(TESTS_OBJ_DIR)/VariableSizeDeque.o			\
+						  	  	  $(TESTS_OBJ_DIR)/MutableGraphTest.o 	
 
 TEST_MUTABLE_GRAPH_TARGET		= $(TESTS_BIN_DIR)/testmutablegraph
 
@@ -45,8 +47,14 @@ TEST_CIRCUIT_NET_OBJ_FILES 		= $(TESTS_OBJ_DIR)/CircuitTrace.o \
 
 TEST_CIRCUIT_NET_TARGET 		= $(TESTS_BIN_DIR)/testnet
 
+TEST_DEQUE_OBJ_FILES			= $(TESTS_OBJ_DIR)/VariableSizeDeque.o 			\
+								  $(TESTS_OBJ_DIR)/MaxSizeDeque.o				\
+								  $(TESTS_OBJ_DIR)/DequeTest.o 
+
+TEST_DEQUE_TARGET 				= $(TESTS_BIN_DIR)/testdeque
 
 all: make_directories 			\
+	run_testdeque 				\
 	run_testgraph				\
 	run_testmutablregraph		\
 	run_testcircuit_trace		\
@@ -54,6 +62,9 @@ all: make_directories 			\
 	generate_coverage 			\
 	$(ANALYSIS_TARGET)
 
+
+run_testdeque: $(TEST_DEQUE_TARGET)
+	$(TEST_DEQUE_TARGET)
 
 run_testgraph: $(TEST_GRAPH_TARGET)
 	$(TEST_GRAPH_TARGET)
@@ -73,6 +84,9 @@ generate_coverage:
 	$(LCOV) --remove $(COVERAGE_INFO_FILE) '/usr/*' '*/tests/src/*'  --output-file $(COVERAGE_INFO_FILE)
 	$(GENHTML) $(COVERAGE_INFO_FILE) --output-directory $(TESTS_HTMLCOV_DIR)
 
+
+$(TEST_DEQUE_TARGET): $(TEST_DEQUE_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^ $(TEST_LDFLAGS) -o $@
 
 $(TEST_GRAPH_TARGET): $(TEST_GRAPH_OBJ_FILES)
 	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@

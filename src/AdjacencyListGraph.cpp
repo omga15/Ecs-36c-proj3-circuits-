@@ -1,8 +1,8 @@
 #include "AdjacencyListGraph.h"
 #include <vector>
-#include <deque>
-#include <functional>
+#include "VariableSizeDeque.h"
 #include "MinHeap.h"
+#include <any>
 
 
 struct CAdjacencyListGraph::SImplementation{
@@ -97,16 +97,16 @@ struct CAdjacencyListGraph::SImplementation{
     // Performs an unweighted breadth-first search starting at the specified vertex.
     // Calls the callback for each visited vertex.
     void BreadthFirstSearchUnweighted(TVertexID start, const TTraversalFunction &callback) const noexcept{
-        std::deque<TVertexID> Horizon;
+        CVariableSizeDeque Horizon;
         std::vector<bool> Visited(DVertices.size(),false);
         std::vector<std::size_t> Depth(DVertices.size(),0);
         std::vector<TVertexID> Parent(DVertices.size(),VertexIDInvalid);
         if(VertexIDIsValid(start)){
-            Horizon.push_back(start);
+            Horizon.PushBack(start);
             Visited[start] = true;
-            while(!Horizon.empty()){
-                auto Current = Horizon.front();
-                Horizon.pop_front();
+            while(Horizon.Size() > 0){
+                auto Current = std::any_cast<TVertexID>(Horizon.Front());
+                Horizon.PopFront();
                 auto CurrentDepth = Depth[Current];
                 auto CurrentParent = Parent[Current];
                 auto Control = callback(Current,CurrentParent,CurrentDepth,std::numeric_limits<double>::quiet_NaN());
@@ -115,7 +115,7 @@ struct CAdjacencyListGraph::SImplementation{
                     for(auto &Edge : DVertices[Current].DEdges){
                         if(VertexIDIsValid(Edge.DDestination) && !Visited[Edge.DDestination]){
                             Visited[Edge.DDestination] = true;
-                            Horizon.push_back(Edge.DDestination);
+                            Horizon.PushBack(Edge.DDestination);
                             Parent[Edge.DDestination] = Current;
                             Depth[Edge.DDestination] = CurrentDepth + 1;
                         }
