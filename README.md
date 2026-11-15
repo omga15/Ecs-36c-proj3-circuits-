@@ -1,8 +1,8 @@
-# Project X README
+# Project 3 README
 
 Student 1: Patrick Wang (924885084)
 
-Student 2: Partner2 Name (123456987)
+Student 2: Lucas Henson (920780125)
 
 ## Project Status
 This the current status of the project ...
@@ -11,7 +11,7 @@ This the current status of the project ...
 The project fails to function properly in ...
 
 ## Code References
-* [Dijka's algorithm](https://graphisual.app/algorithm/dijkstra)
+* [Dijkstra's algorithm](https://graphisual.app/algorithm/dijkstra)
 * [______](____________)
 * [______](____________)
 * [______](____________)

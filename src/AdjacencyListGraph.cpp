@@ -159,17 +159,63 @@ struct CAdjacencyListGraph::SImplementation{
     // Returns true if the search completes successfully.
     bool BreadthFirstSearchWeighted(TVertexID start, const TTraversalFunction &callback) const noexcept{
         
-        // Initialize arrays (priority queue, as well?) (Store distance and vertex ids as pairs)
-        
-        // Mark distance to the starting vertex as 0 (it is already found)
+        // If not a valid vertex, can return early
+        if(start < 0 || start >= DVertices.size()) return false;
 
-        // Loop while the queue is not empty, adjusting the distance if a shorter one is found
+        // Aliases for convenience
+        using DVPair = std::pair<double, TVertexID>;
+        const double INF = std::numeric_limits<double>::max();
 
-        // Push neighbors into the queue with their current distance (the priority queue will handle sorting them)
+        // The queue that will handle the traversal
+        std::priority_queue<DVPair, std::vector<DVPair>, std::greater<DVPair> > queue;
 
-        // Repeat with the next vertex in the priority queue
+        // Array to handle distances from the source vertex, initialized to inf
+        std::vector<double> dist(DVertices.size(), INF);
 
-        return false;
+        // Distance to the starting node is 0
+        dist[start] = 0;
+
+        queue.push({0, start});
+
+        // While there are vertices in the queue
+        while(!queue.empty()) {
+
+            // Grab the next vertex
+            auto [d, v] = queue.top();
+            queue.pop();
+
+            // If d is at any point negative, bail out
+            if(d < 0) return false;
+
+            // If d is greater than what has already been found, ignore
+            if(d > dist[v]) continue;
+
+            // Call the callback function on the vertex
+            EGraphTraversal control = callback(v, v, 0, d);
+
+            [[unlikely]] if(control == EGraphTraversal::Stop) return false;
+
+            // Iterate through all of the edges, updating any shorter distances found
+            for(const auto& edge : DVertices[v].DEdges) {
+
+                TVertexID dest = edge.DDestination;
+
+                double newDist = d + edge.DWeight;
+
+                if(newDist < dist[dest]) {
+
+                    dist[dest] = newDist;
+
+                    // Push the neighbors onto the queue for consideration next
+                    queue.push({newDist, dest});
+
+                }
+
+            }
+
+        }
+
+        return true;
     }
 
 
