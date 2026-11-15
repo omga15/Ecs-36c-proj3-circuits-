@@ -12,7 +12,7 @@ The project fails to function properly in ...
 
 ## Code References
 * [Dijkstra's algorithm](https://graphisual.app/algorithm/dijkstra)
-* [______](____________)
+* [Exceptions/throw reference](https://en.cppreference.com/cpp/language/throw)
 * [______](____________)
 * [______](____________)
 * [______](____________)

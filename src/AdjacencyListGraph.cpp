@@ -1,8 +1,8 @@
 #include "AdjacencyListGraph.h"
 #include <vector>
 #include <deque>
-#include <queue>
 #include <functional>
+#include "MinHeap.h"
 
 
 struct CAdjacencyListGraph::SImplementation{
@@ -167,7 +167,7 @@ struct CAdjacencyListGraph::SImplementation{
         const double INF = std::numeric_limits<double>::max();
 
         // The queue that will handle the traversal
-        std::priority_queue<DVPair, std::vector<DVPair>, std::greater<DVPair> > queue;
+        MinHeap<DVPair> queue;
 
         // Array to handle distances from the source vertex, initialized to inf
         std::vector<double> dist(DVertices.size(), INF);
