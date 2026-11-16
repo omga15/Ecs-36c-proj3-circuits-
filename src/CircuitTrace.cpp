@@ -51,7 +51,7 @@ struct CCircuitTrace::SImplementation{
         
     }
 
-    bool SourceDestinationAsEdge(SCircuitTraceEdge &edge) const{ //where do i return this??
+    bool SourceDestinationAsEdge(SCircuitTraceEdge &edge) const{ // gives back source and destination of an edge
         if(DEdge.empty()){
             return false;
         }
@@ -59,16 +59,19 @@ struct CCircuitTrace::SImplementation{
         edge.DDestination = DEdge.back().DDestination;
         return true;
     }
-
+    
     bool AddEdge(const SCircuitTraceEdge &edge){
         if(DLocations.empty()){ // checks if empty
             DLocations.push_back(edge.DSource);
         }
+
+        SCircuitTraceEdge Reverse{edge.DDestination, edge.DSource}; // reverse of a edge 
+
         for(int i = 0; i < EdgeCount(); i++){ //going through to see if there are duplicate edges
             if(find(DEdge.begin(),DEdge.end(),edge ) != DEdge.end()){
                 return false;
             }
-            if(find(DEdge.rbegin(),DEdge.rend(),edge ) != DEdge.rend()){ // possible reverse edge dif
+            if(find(DEdge.begin(),DEdge.end(),Reverse ) != DEdge.end()){ // possible reverse edge dif
                 return false;
             }
         }
@@ -85,10 +88,34 @@ struct CCircuitTrace::SImplementation{
     }
 
     bool ConcatenateTrace(const CCircuitTrace &trace){ // add trace to the end of Prev trace
-        for(const auto &Edge : trace.DImplementation->DEdge){
-            AddEdge(Edge);
+        const std::size_t Count = trace.EdgeCount();
+        if(Count == 0){ //check if trace is empty
+            return false;
         }
-        return false;
+
+        SCircuitTraceEdge Span;
+        trace.SourceDestinationAsEdge(Span);
+
+        bool Flip = false; 
+        if(!DEdge.empty()){ // checking if the source of new trace matches with the end of old trace
+            const SCircuitLocation &End = DEdge.back().DDestination;
+            Flip = !(Span.DSource == End) && (Span.DDestination == End);
+        }
+
+        SCircuitTraceEdge Current;
+        if(Flip){
+            for(std::size_t I = Count; I > 0; I--){ // 
+                trace.Edge(I, Current);
+                AddEdge(SCircuitTraceEdge{Current.DDestination, Current.DSource});
+            }
+        }
+        else{
+            for(std::size_t I = 0; I < Count; I++){
+                trace.Edge(I, Current);
+                AddEdge(Current);
+            }
+        }
+        return true;
     }
 
     bool IsBroken() const{

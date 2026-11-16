@@ -71,7 +71,8 @@ all: make_directories 			\
 	$(ANALYSIS_TARGET)
 	
 # delete later made for faster compilation of current project
-this: make_directories 			\ 
+
+this: make_directories 			\
 	run_testcircuit_trace		\
 	run_testcircuit_net 		\
 	generate_coverage 			\
