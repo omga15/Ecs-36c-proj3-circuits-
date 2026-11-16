@@ -1,19 +1,18 @@
 #include "CircuitTrace.h"
+#include <algorithm>
 
 
 struct CCircuitTrace::SImplementation{
 
-    // Starting location of the edge.
-    SCircuitLocation DSource;
+    // storeing trace.
+    std::vector<SCircuitLocation> DLocations;
 
-    // Ending location of the edge.
-    SCircuitLocation DDestination;
-    std::vector<SCircuitTraceEdge> DEdge;
-    std::vector<SCircuitBoardLocation> DLocation;
+    std::vector<SCircuitTraceEdge> DEdge; // in between 2 locations
 
-    //name of circuit
+    // name of circuit
     TCircuitName DName = ""; 
 
+    
     TCircuitName Name() const{
         return DName;
     }
@@ -28,15 +27,15 @@ struct CCircuitTrace::SImplementation{
     }
 
     std::size_t LocationCount() const{
-        return DLocation.size();
+        return DLocations.size();
     }
 
     bool Location(std::size_t index, SCircuitLocation &location) const{ // gets the location using index and stores in location???
-        if(index > LocationCount()){
-            location = DLocation[index].DLocation;
-            return true;
+        if(index >= LocationCount()){
+            return false;
         }
-        return false;
+        location = DLocations[index];
+        return true;
     }
 
     std::size_t EdgeCount() const{
@@ -44,28 +43,61 @@ struct CCircuitTrace::SImplementation{
     }
 
     bool Edge(std::size_t index, SCircuitTraceEdge &edge) const{
-        if(index > EdgeCount()){
-            edge = DEdge[index];
-            return true;
+        if(index >= EdgeCount()){
+            return false;
+        }
+        edge = DEdge[index];
+        return true;
+        
+    }
+
+    bool SourceDestinationAsEdge(SCircuitTraceEdge &edge) const{ //where do i return this??
+        if(DEdge.empty()){
+            return false;
+        }
+        edge.DSource = DEdge.front().DSource;
+        edge.DDestination = DEdge.back().DDestination;
+        return true;
+    }
+
+    bool AddEdge(const SCircuitTraceEdge &edge){
+        if(DLocations.empty()){ // checks if empty
+            DLocations.push_back(edge.DSource);
+        }
+        for(int i = 0; i < EdgeCount(); i++){ //going through to see if there are duplicate edges
+            if(find(DEdge.begin(),DEdge.end(),edge ) != DEdge.end()){
+                return false;
+            }
+            if(find(DEdge.rbegin(),DEdge.rend(),edge ) != DEdge.rend()){ // possible reverse edge dif
+                return false;
+            }
+        }
+
+        DEdge.push_back(edge);
+
+        for(const auto &Loc : {edge.DSource, edge.DDestination}){ // Checks if the location has been added
+            if(find(DLocations.begin(), DLocations.end(), Loc) == DLocations.end()){
+                DLocations.push_back(Loc);
+            }
+        }
+
+        return true;
+    }
+
+    bool ConcatenateTrace(const CCircuitTrace &trace){ // add trace to the end of Prev trace
+        for(const auto &Edge : trace.DImplementation->DEdge){
+            AddEdge(Edge);
         }
         return false;
     }
 
-    bool SourceDestinationAsEdge(SCircuitTraceEdge &edge) const{ //where do i return this??
-        return false;
-    }
-
-    bool AddEdge(const SCircuitTraceEdge &edge){
-        DEdge.push_back(edge);
-        return true;
-    }
-
-    bool ConcatenateTrace(const CCircuitTrace &trace){
-        
-        return false;
-    }
-
     bool IsBroken() const{
+        const auto &Edge = DEdge; // idea for broken
+        for(std::size_t Index = 0; Index + 1 < Edge.size(); Index++){
+            if(!(Edge[Index].DDestination == Edge[Index + 1].DSource)){
+                return true;
+            }
+        }
         return false;
     }
 

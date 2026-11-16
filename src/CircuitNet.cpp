@@ -7,7 +7,7 @@ struct CCircuitNet::SImplementation{
     struct Pins{
         SCircuitLocation DDestination;
     };
-
+    // Pin storage related 
     std::vector<Pins> DPin;
     std::vector<bool> DDelete;
 
