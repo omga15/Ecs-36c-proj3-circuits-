@@ -1,2 +1,5 @@
 # Mac related file
 .DS_STORE
+
+# VSCode config stuff
+/.vscode

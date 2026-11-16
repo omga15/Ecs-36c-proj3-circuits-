@@ -36,6 +36,13 @@ TEST_MUTABLE_GRAPH_OBJ_FILES	= $(TESTS_OBJ_DIR)/AdjacencyListGraph.o 		\
 
 TEST_MUTABLE_GRAPH_TARGET		= $(TESTS_BIN_DIR)/testmutablegraph
 
+TEST_GRID_GRAPH_OBJ_FILES = $(TESTS_OBJ_DIR)/VGridGraph.o \
+							$(TESTS_OBJ_DIR)/GridGraphTest.o \
+							$(TESTS_OBJ_DIR)/AdjacencyListGraph.o \
+							$(TESTS_OBJ_DIR)/VariableSizeDeque.o
+
+TEST_GRID_GRAPH_TARGET = $(TESTS_BIN_DIR)/testgridgraph
+
 TEST_CIRCUIT_TRACE_OBJ_FILES 	= $(TESTS_OBJ_DIR)/CircuitTrace.o 				\
 									$(TESTS_OBJ_DIR)/CircuitTraceTest.o
 						
@@ -57,6 +64,7 @@ all: make_directories 			\
 	run_testdeque 				\
 	run_testgraph				\
 	run_testmutablregraph		\
+	run_testgridgraph			\
 	run_testcircuit_trace		\
 	run_testcircuit_net 		\
 	generate_coverage 			\
@@ -71,6 +79,9 @@ run_testgraph: $(TEST_GRAPH_TARGET)
 
 run_testmutablregraph: $(TEST_MUTABLE_GRAPH_TARGET)
 	$(TEST_MUTABLE_GRAPH_TARGET)
+
+run_testgridgraph: $(TEST_GRID_GRAPH_TARGET)
+	$(TEST_GRID_GRAPH_TARGET)
 
 run_testcircuit_trace: $(TEST_CIRCUIT_TRACE_TARGET)
 	$(TEST_CIRCUIT_TRACE_TARGET)
@@ -93,6 +104,9 @@ $(TEST_GRAPH_TARGET): $(TEST_GRAPH_OBJ_FILES)
 
 $(TEST_MUTABLE_GRAPH_TARGET): $(TEST_MUTABLE_GRAPH_OBJ_FILES)
 	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@
+
+$(TEST_GRID_GRAPH_TARGET): $(TEST_GRID_GRAPH_OBJ_FILES)
+	$(CXX) $(TEST_CPPFLAGS) $^ $(TEST_LDFLAGS) -o $@
 
 $(TEST_CIRCUIT_TRACE_TARGET): $(TEST_CIRCUIT_TRACE_OBJ_FILES)
 	$(CXX) $(TEST_CPPFLAGS) $^  $(TEST_LDFLAGS) -o $@

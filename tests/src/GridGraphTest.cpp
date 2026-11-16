@@ -16,7 +16,7 @@
 #include <vector>
 
 // Replace this with your concrete Grid implementation types.
-using GridGraphImplementations = ::testing::Types<YOUR_GRAPH_HERE>;
+using GridGraphImplementations = ::testing::Types<VGridGraph>;
 
 // -----------------------------------------------------------------------------
 // Typed test fixture
