@@ -89,32 +89,67 @@ struct CCircuitTrace::SImplementation{
 
     bool ConcatenateTrace(const CCircuitTrace &trace){ // add trace to the end of Prev trace
         const std::size_t Count = trace.EdgeCount();
+        
         if(Count == 0){ //check if trace is empty
             return false;
         }
-
+       
         SCircuitTraceEdge Span;
-        trace.SourceDestinationAsEdge(Span);
-
-        bool Flip = false; 
-        if(!DEdge.empty()){ // checking if the source of new trace matches with the end of old trace
-            const SCircuitLocation &End = DEdge.back().DDestination;
-            Flip = !(Span.DSource == End) && (Span.DDestination == End);
+        trace.SourceDestinationAsEdge(Span); // tell what the new trace source and destination
+        bool reversed;  // variables used to store conditions 
+        bool append;
+        
+        const SCircuitLocation &Start = DEdge.front().DSource; //easier reading 
+        const SCircuitLocation &End = DEdge.back().DDestination;
+        const SCircuitLocation &OtherStart = Span.DSource;
+        const SCircuitLocation &OtherEnd = Span.DDestination;
+        
+        if(OtherStart == End){ // conditionals for whether to append or reverse the trace.
+            append = true; reversed = false;
+        }
+        else if (OtherEnd == End){
+            append = true; reversed = true;
+        }
+        else if(OtherEnd == Start){
+            append = false; reversed = false;
+        }
+        else if(OtherStart == Start){
+            append = false; reversed = true;
+        }
+        else{
+            return false;
         }
 
         SCircuitTraceEdge Current;
-        if(Flip){
-            for(std::size_t I = Count; I > 0; I--){ // 
-                trace.Edge(I, Current);
-                AddEdge(SCircuitTraceEdge{Current.DDestination, Current.DSource});
+        std::vector<SCircuitTraceEdge> NewTrace;
+        if(reversed){
+            for(std::size_t I = Count; I > 0; I--){ // reversing order
+                trace.Edge(I - 1, Current);
+                NewTrace.push_back(SCircuitTraceEdge{Current.DDestination, Current.DSource});
             }
         }
         else{
             for(std::size_t I = 0; I < Count; I++){
                 trace.Edge(I, Current);
-                AddEdge(Current);
+                NewTrace.push_back(Current);
             }
         }
+
+        if(append){ // adds to old trace or adds old trace to new trace
+            DEdge.insert(DEdge.begin() + 1, NewTrace.begin(), NewTrace.end());
+        }
+        else{
+            DEdge.insert(DEdge.begin() , NewTrace.begin(), NewTrace.end());
+        }
+        
+        DLocations.clear();
+        DLocations.push_back(DEdge.front().DSource);
+        for(const auto &E : DEdge){
+            if(std::find(DLocations.begin(), DLocations.end(), E.DDestination) == DLocations.end()){
+                DLocations.push_back(E.DDestination);
+            }
+        }
+
         return true;
     }
 
