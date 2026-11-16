@@ -69,6 +69,13 @@ all: make_directories 			\
 	run_testcircuit_net 		\
 	generate_coverage 			\
 	$(ANALYSIS_TARGET)
+	
+# delete later made for faster compilation of current project
+this: make_directories 			\ 
+	run_testcircuit_trace		\
+	run_testcircuit_net 		\
+	generate_coverage 			\
+	$(ANALYSIS_TARGET)
 
 
 run_testdeque: $(TEST_DEQUE_TARGET)

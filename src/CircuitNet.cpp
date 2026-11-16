@@ -1,50 +1,67 @@
 #include "CircuitNet.h"
+#include <algorithm>
+#include <vector>
 
 
 struct CCircuitNet::SImplementation{
-    TCircuitName DName; 
-    
-    struct Pins{
-        SCircuitLocation DDestination;
-    };
+
     // Pin storage related 
-    std::vector<Pins> DPin;
-    std::vector<bool> DDelete;
+    TCircuitName DName;
+    std::vector<SCircuitLocation> DPins;
+    std::vector<CCircuitTrace> DTraces;
 
     TCircuitName Name() const{
         return DName;
     }
 
     TCircuitName Name(const TCircuitName &name){
-        return DName = name;
+        if (name == "")
+        {
+            return DName;
+        }
+        DName = name;
+        return DName;
     }
 
     std::size_t PinCount() const{
-        return DPin.size();
+        return DPins.size();
     }
 
     bool PinLocation(std::size_t index, SCircuitLocation &location) const{
-        if(index >= DPin.size()){
-            location = DPin[index].DDestination;
+        if(index >= DPins.size()){
+            return false;
         }       
-        return false;
+        location = DPins[index];
+        return true;
     }
 
-    bool AddPinLocation(const SCircuitLocation &location){
-        
-        return false;
+    bool AddPinLocation(const SCircuitLocation &location){ // amount of Pins
+        const auto &Pins = DPins;
+        for(size_t i = 0; i < PinCount(); i++){ //going through to see if there are duplicate pins
+            SCircuitLocation Existing;
+            if(PinLocation(i,Existing) && Existing == location){
+                return false;
+            }
+        }
+        DPins.push_back(location);
+        return true;
     }
 
-    std::size_t TraceCount() const{
-        return 0;
+    std::size_t TraceCount() const{  // amount of traces
+        return DTraces.size();
     }
 
-    bool Trace(std::size_t index, CCircuitTrace &trace) const{
-        return false;
+    bool Trace(std::size_t index, CCircuitTrace &trace) const{ // find a trace index
+        if(index >= TraceCount()){
+            return false;
+        }
+        trace = DTraces[index]; 
+        return true;
     }
 
-    bool AddTrace(const CCircuitTrace &trace){
-        return false;
+    bool AddTrace(const CCircuitTrace &trace){ // adds trace
+        DTraces.push_back(trace); 
+        return true;
     }
 
     bool IsBroken() const{
