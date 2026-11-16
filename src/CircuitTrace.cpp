@@ -242,11 +242,97 @@ struct CCircuitTrace::SImplementation{
     }
 
     CCircuitTrace Simplify() const{
-        return CCircuitTrace();
+
+        // Create a new trace with the same name
+        CCircuitTrace newTrace = CCircuitTrace();
+        newTrace.Name(DName);
+
+        // If there are no edges in the trace to simplify, we are done.
+        if(DEdge.empty()) return newTrace;
+
+        // Grab the first edge
+        SCircuitTraceEdge current = DEdge[0];
+
+        // Iterate through the rest of the edges, checking if they are going in the same direction.
+        // If so, add to the current running edge, if not commit what we have and go again.
+        for(std::size_t index = 1; index < DEdge.size(); index++) {
+
+            long dx = static_cast<long>(current.DDestination.DX) - static_cast<long>(current.DSource.DX);
+            long dy = static_cast<long>(current.DDestination.DY) - static_cast<long>(current.DSource.DY);
+
+            long nextDx = static_cast<long>(DEdge[index].DDestination.DX) - static_cast<long>(DEdge[index].DSource.DX);
+            long nextDy = static_cast<long>(DEdge[index].DDestination.DY) - static_cast<long>(DEdge[index].DSource.DY);
+
+            int ux = (dx > 0) ? 1 : ((dx < 0) ? -1 : 0);
+            int uy = (dy > 0) ? 1 : ((dy < 0) ? -1 : 0);
+
+            int nextUx = (nextDx > 0) ? 1 : ((nextDx < 0) ? -1 : 0);
+            int nextUy = (nextDy > 0) ? 1 : ((nextDy < 0) ? -1 : 0); 
+
+            if(current.DDestination == DEdge[index].DSource && ux == nextUx && uy == nextUy) {
+
+                current.DDestination = DEdge[index].DDestination;
+
+            }
+
+            else {
+
+                newTrace.AddEdge(current);
+
+                current = DEdge[index];
+
+            }
+
+        }
+
+        // Add the most recent running edge and return the new, simplified trace
+        newTrace.AddEdge(current);
+
+        return newTrace;
+
     }
 
     CCircuitTrace Elaborate() const{
-        return CCircuitTrace();
+
+        // Create a new, empty trace with the same name
+        CCircuitTrace newTrace = CCircuitTrace();
+        newTrace.Name(DName);
+
+        // If there are no edges to elaborate, we are done
+        if(DEdge.empty()) return newTrace;
+
+        // Iterate over all edges in the old trace
+        for(const auto& edge : DEdge) {
+
+            // Calculate the direction it is going in
+            long dx = static_cast<long>(edge.DDestination.DX) - static_cast<long>(edge.DSource.DX);
+            long dy = static_cast<long>(edge.DDestination.DY) - static_cast<long>(edge.DSource.DY);
+
+            // Normalize its direction
+            int ux = (dx > 0) ? 1 : ((dx < 0) ? -1 : 0);
+            int uy = (dy > 0) ? 1 : ((dy < 0) ? -1 : 0);
+
+            // Used to keep track of the current location on the edge
+            SCircuitLocation currentLoc = edge.DSource;
+
+            // Guards against zero length edges, and denotes we are finished when we reach the end
+            while(currentLoc != edge.DDestination) {
+
+                // Increment currentLoc, and add a new edge to the trace
+                SCircuitLocation prevLoc = currentLoc;
+
+                currentLoc.DX += ux;
+                currentLoc.DY += uy;
+
+                newTrace.AddEdge({prevLoc, currentLoc});
+
+            }
+
+        }
+
+        // Return the new, elaborated trace
+        return newTrace;
+
     }
 };
 
