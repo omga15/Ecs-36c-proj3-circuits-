@@ -102,7 +102,81 @@ struct CCircuitTrace::SImplementation{
     }
 
     bool Fix(){
-        return false;
+
+        if(DEdge.size() > 1) {
+
+            if(DEdge[0].DDestination != DEdge[1].DSource && (DEdge[0].DSource == DEdge[1].DSource || DEdge[0].DSource == DEdge[1].DDestination)) {
+
+                std::swap(DEdge[0].DSource, DEdge[0].DDestination);
+
+            }
+
+        }
+
+        for(std::size_t index = 0; index + 1 < DEdge.size(); index++) {
+
+            if(DEdge[index].DDestination == DEdge[index + 1].DSource) continue;
+
+            if(DEdge[index].DDestination == DEdge[index + 1].DDestination) std::swap(DEdge[index + 1].DSource, DEdge[index + 1].DDestination);
+
+            else {
+
+                SCircuitLocation p1 = DEdge[index].DDestination;
+                SCircuitLocation p2 = DEdge[index + 1].DSource;
+
+                long dx = static_cast<long>(p2.DX) - static_cast<long>(p1.DX);
+                long dy = static_cast<long>(p2.DY) - static_cast<long>(p1.DY);
+                
+                long adx = std::abs(dx);
+                long ady = std::abs(dy);
+
+                if(adx == 0 || ady == 0 || adx == ady) {
+
+                    DEdge.insert(DEdge.begin() + index + 1, SCircuitTraceEdge{p1, p2});
+
+                    index++;
+
+                }
+                else {
+
+                    long diag = std::min(adx, ady);
+
+                    long sx = (dx > 0) ? 1 : -1;
+
+                    long sy = (dy > 0) ? 1 : -1;
+
+                    SCircuitLocation mid{
+                        static_cast<TCircuitCoordinate>(static_cast<long>(p1.DX) + sx * diag),
+                        static_cast<TCircuitCoordinate>(static_cast<long>(p1.DY) + sy * diag)
+                    };
+
+                    DEdge.insert(DEdge.begin() + index + 1, SCircuitTraceEdge{p1, mid});
+
+                    DEdge.insert(DEdge.begin() + index + 2, SCircuitTraceEdge{mid, p2});
+
+                    index += 2;
+
+                }
+
+            }
+
+        }
+
+        DLocations.clear();
+        if(!DEdge.empty()) {
+            
+            DLocations.push_back(DEdge[0].DSource);
+        
+            for(const auto& edge : DEdge) {
+
+                DLocations.push_back(edge.DDestination);
+
+            }
+
+        }
+
+        return !IsBroken();
+
     }
 
     CCircuitTrace Simplify() const{
