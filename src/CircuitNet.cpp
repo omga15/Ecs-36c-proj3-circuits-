@@ -91,31 +91,85 @@ struct CCircuitNet::SImplementation{
     }
 
     bool IsBroken() const{
-        if(DTraces.empty())
+        if(DTraces.empty() || DPins.empty())
         {
             return true;
         }
+
         for(const auto &trace : DTraces){
             if(trace.IsBroken()){
                 return true;
             }
         }
         
-        std::size_t TotalEdges = 0; // N pins should have N-1 edges
-        for(const auto &Current : DTraces){
-            TotalEdges += Current.EdgeCount();
+        std::vector<SCircuitTraceEdge> unitEdges;
+
+        for(const auto &trace : DTraces) {
+
+            CCircuitTrace elaborated;
+
+            elaborated = trace.Elaborate();
+
+            for(std::size_t index = 0; index < elaborated.EdgeCount(); index++) {
+
+                SCircuitTraceEdge edge;
+
+                elaborated.Edge(index, edge);
+
+                unitEdges.push_back(edge);
+
+            }
+
         }
-        if(!DPins.empty() && TotalEdges < DPins.size() - 1){
-            return true;
+
+        std::vector<SCircuitLocation> visited = { DPins[0] };
+
+        bool added = true;
+
+        while(added) {
+
+            added = false;
+
+            for(const auto& edge : unitEdges) {
+
+                if(std::find(visited.begin(), visited.end(), edge.DSource) != visited.end() && std::find(visited.begin(), visited.end(), edge.DDestination) == visited.end()) {
+
+                    added = true;
+
+                    visited.push_back(edge.DDestination);
+
+                }
+
+                if(std::find(visited.begin(), visited.end(), edge.DDestination) != visited.end() && std::find(visited.begin(), visited.end(), edge.DSource) == visited.end()) {
+
+                    added = true;
+
+                    visited.push_back(edge.DSource);
+
+                }
+
+            }
+
         }
+
+        for(const auto& pin : DPins) {
+
+            if(std::find(visited.begin(), visited.end(), pin) == visited.end()) return true;
+
+        }
+
         return false;
+        
     }
 
     bool Fix(){
-        for(auto &trace : DTraces){
-            if(trace.IsBroken()){
-                return trace.Fix();
-            }
+        
+        if(DPins.size() < 2) return false;
+
+        for(auto &trace : DTraces) {
+
+            if(!trace.Fix()) return false;
+
         }
         return !IsBroken();
     }
