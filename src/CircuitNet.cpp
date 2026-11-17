@@ -100,6 +100,14 @@ struct CCircuitNet::SImplementation{
                 return true;
             }
         }
+        
+        std::size_t TotalEdges = 0; // N pins should have N-1 edges
+        for(const auto &Current : DTraces){
+            TotalEdges += Current.EdgeCount();
+        }
+        if(!DPins.empty() && TotalEdges < DPins.size() - 1){
+            return true;
+        }
         return false;
     }
 
