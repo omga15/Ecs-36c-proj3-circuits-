@@ -191,9 +191,13 @@ struct CCircuitNet::SImplementation{
             if(DegreeTwoAndNotInPins(pair.first, locDegree)) continue;
 
             for(std::size_t index = 0; index < seenEdges.size(); index++) {
+
                 if(visited[index] || (pair.first != seenEdges[index].DSource && pair.first != seenEdges[index].DDestination)) {
+
                     continue;
+
                 }
+                
                 CCircuitTrace newTrace;
 
                 newTrace.Name(DName);
