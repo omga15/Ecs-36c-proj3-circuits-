@@ -331,7 +331,16 @@ struct CCircuitNet::SImplementation{
 }
 
     bool ElaborateTraces(){
-        return false;
+
+        if(DTraces.empty()) return false;
+
+        for(auto& trace : DTraces) {
+
+            trace = trace.Elaborate();
+
+        }
+
+        return true;
     }
 
     bool DegreeTwoAndNotInPins(SCircuitLocation loc, std::vector<std::pair<SCircuitLocation, int> >& locDegree) const {
