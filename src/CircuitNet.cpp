@@ -1,6 +1,7 @@
 #include "CircuitNet.h"
 #include <algorithm>
 #include <vector>
+#include <utility>
 
 
 struct CCircuitNet::SImplementation{
@@ -73,11 +74,241 @@ struct CCircuitNet::SImplementation{
     }
 
     bool SimplifyTraces(){
-        return false;
+        
+        if(DTraces.empty()) return false;
+
+        for(auto& trace : DTraces) {
+
+            trace = trace.Elaborate();
+
+        }
+
+        using LCPair = std::pair<SCircuitLocation, int>;
+
+        std::vector<LCPair> locDegree;
+
+        std::vector<SCircuitTraceEdge> seenEdges;
+
+        for(const auto& trace : DTraces) {
+
+            for(std::size_t index = 0; index < trace.EdgeCount(); index++) {
+
+                SCircuitTraceEdge edge;
+
+                trace.Edge(index, edge);
+
+                bool found = false;
+
+                for(const auto& prevEdge : seenEdges) {
+
+                    if((prevEdge.DSource == edge.DSource && prevEdge.DDestination == edge.DDestination) || (prevEdge.DDestination == edge.DSource && prevEdge.DSource == edge.DDestination)) {
+
+                        found = true;
+
+                        break;
+
+                    }
+
+                }
+
+                if(!found) seenEdges.push_back(edge);
+
+            }
+
+        }
+
+        for(const auto& edge : seenEdges) {
+
+            bool foundS = false;
+            bool foundD = false;
+
+            SCircuitLocation source = edge.DSource;
+            SCircuitLocation destination = edge.DDestination;
+
+            for(auto& pair : locDegree) {
+
+                if(pair.first == source) {
+
+                    foundS = true;
+
+                    pair.second++;
+
+                } 
+
+                if(pair.first == destination) {
+
+                    foundD = true;
+
+                    pair.second++;
+
+                } 
+
+            }
+
+            if(!foundS) {
+
+                locDegree.push_back({source, 1});
+
+            }
+
+            if(!foundD) {
+
+                locDegree.push_back({destination, 1});
+
+            }
+
+
+        }
+
+    std::vector<bool> visited(seenEdges.size(), false);
+    std::vector<CCircuitTrace> newTraces;
+
+    for(const auto& pair : locDegree) {
+
+        auto it = std::find(DPins.begin(), DPins.end(), pair.first);
+
+        if(pair.second == 2 && it == DPins.end()) continue;
+                
+
+        for(std::size_t index = 0; index < seenEdges.size(); index++) {
+
+            if(visited[index]) continue;
+
+            if(pair.first != seenEdges[index].DSource && pair.first != seenEdges[index].DDestination) continue;
+
+            visited[index] = true;
+
+            CCircuitTrace newTrace = CCircuitTrace();
+
+            newTrace.Name(DName);
+
+            SCircuitLocation current;
+
+            if(pair.first == seenEdges[index].DSource) {
+
+                newTrace.AddEdge({pair.first, seenEdges[index].DDestination});
+
+                current = seenEdges[index].DDestination;
+
+            }
+
+            else {
+
+                newTrace.AddEdge({pair.first, seenEdges[index].DSource});
+
+                current = seenEdges[index].DSource;
+
+            }
+
+            while(DegreeTwoAndNotInPins(current, locDegree)) {
+
+                for(std::size_t j = 0; j < seenEdges.size(); j++) {
+
+                    if(visited[j] || (current != seenEdges[j].DSource && current != seenEdges[j].DDestination)) continue;
+
+                    visited[j] = true;
+
+                    if(current == seenEdges[j].DSource) {
+
+                        newTrace.AddEdge({current, seenEdges[j].DDestination});
+
+                        current = seenEdges[j].DDestination;
+
+                    }
+
+                    else {
+
+                        newTrace.AddEdge({current, seenEdges[j].DSource});
+
+                        current = seenEdges[j].DSource;
+
+                    }
+
+                    break;
+
+                }
+
+            }
+
+            newTraces.push_back(newTrace.Simplify());
+
+        }
+
     }
+
+    for(std::size_t index = 0; index < seenEdges.size(); index++) {
+
+        if(visited[index]) continue;
+
+        visited[index] = true;  
+
+        CCircuitTrace stragglerTrace = CCircuitTrace();
+
+        stragglerTrace.Name(DName);
+
+        stragglerTrace.AddEdge(seenEdges[index]);
+
+        SCircuitLocation start = seenEdges[index].DSource;
+        SCircuitLocation current = seenEdges[index].DDestination;
+
+        while(start != current) {
+
+            for(std::size_t j = 0; j < seenEdges.size(); j++) {
+
+                if(visited[j] || (seenEdges[j].DSource != current && seenEdges[j].DDestination != current)) continue;
+
+                visited[j] = true;
+
+                if(seenEdges[j].DSource == current) {
+
+                    stragglerTrace.AddEdge({current, seenEdges[j].DDestination});
+
+                    current = seenEdges[j].DDestination;
+
+                }
+
+                else {
+
+                    stragglerTrace.AddEdge({current, seenEdges[j].DSource});
+
+                    current = seenEdges[j].DSource;
+
+                }
+
+                break;
+
+            }
+
+        }
+
+        newTraces.push_back(stragglerTrace.Simplify());
+
+    }
+
+    DTraces = newTraces;
+
+    return true;
+
+}
 
     bool ElaborateTraces(){
         return false;
+    }
+
+    bool DegreeTwoAndNotInPins(SCircuitLocation loc, std::vector<std::pair<SCircuitLocation, int> >& locDegree) const {
+
+        auto it = std::find(DPins.begin(), DPins.end(), loc);
+
+        int deg = 0;
+
+        for(const auto& pair : locDegree) {
+
+            if(pair.first == loc) deg = pair.second;
+
+        }
+
+        return it == DPins.end() && deg == 2;
+
     }
 };
 
