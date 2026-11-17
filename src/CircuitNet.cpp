@@ -117,7 +117,7 @@ struct CCircuitNet::SImplementation{
                 return trace.Fix();
             }
         }
-        return false;
+        return !IsBroken();
     }
 
     bool SimplifyTraces(){
