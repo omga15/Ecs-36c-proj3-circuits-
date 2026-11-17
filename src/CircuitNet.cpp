@@ -61,15 +61,54 @@ struct CCircuitNet::SImplementation{
     }
 
     bool AddTrace(const CCircuitTrace &trace){ // adds trace
+
+        if(DName != trace.Name()){
+            return false;
+        }
+        
+        for(const auto &CurrentTraces : DTraces)
+        {
+            
+            if(CurrentTraces.Name() == trace.Name() && CurrentTraces.EdgeCount() == trace.EdgeCount()){
+                SCircuitTraceEdge DEdge; //edge holder 
+                SCircuitTraceEdge CEdge; // current Edge holder
+                bool same = true;
+                for(size_t i = 0; i < trace.EdgeCount(); i++){
+                    CurrentTraces.Edge(i,DEdge);
+                    trace.Edge(i,CEdge);
+                    if(DEdge != CEdge){
+                        same = false;
+                        break;
+                    }
+                }
+                if(same){return false;}
+            }
+            
+        }
+        
         DTraces.push_back(trace); 
         return true;
     }
 
     bool IsBroken() const{
+        if(DTraces.empty())
+        {
+            return true;
+        }
+        for(const auto &trace : DTraces){
+            if(trace.IsBroken()){
+                return true;
+            }
+        }
         return false;
     }
 
     bool Fix(){
+        for(auto &trace : DTraces){
+            if(trace.IsBroken()){
+                return trace.Fix();
+            }
+        }
         return false;
     }
 
