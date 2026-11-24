@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>simple</title>
+
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 20px;
+    }
+
+    .layout {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    #controls {
+        width: 180px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .sub-layers {
+        display: flex;
+        flex-direction: column;
+        margin-left: 24px;
+        padding-left: 8px;
+        border-left: 2px solid #ccc;
+    }
+
+    .sub-layers label {
+        font-size: 0.9em;
+    }
+
+    #viewer {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid #ccc;
+    }
+
+    #viewer svg {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+    .layer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .layer-header label {
+        cursor: pointer;
+    }
+
+    .expand-button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .expand-button:hover {
+        color: #007bff;
+    }
+.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+</style>
+</head>
+
+<body>
+
+<h2>simple</h2>
+
+<div class="layout">
+
+    <!-- Left sidebar -->
+    <div id="controls">
+        <strong>Layers</strong>
+        <label><input type="checkbox" checked onchange="toggleLayer('gnd', this.checked)">GND</label>
+         <div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer0', this.checked)">Layer 0</label>
+             <button class="expand-button" onclick="toggleSublayer('layer0-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer0-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('a', this.checked)">A</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('c', this.checked)">C</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('d', this.checked)">D</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('e', this.checked)">E</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('v', this.checked)">V</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('w', this.checked)">W</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('x', this.checked)">X</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('y', this.checked)">Y</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('z', this.checked)">Z</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer1', this.checked)">Layer 1</label>
+             <button class="expand-button" onclick="toggleSublayer('layer1-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer1-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('b', this.checked)">B</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('g', this.checked)">G</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer2', this.checked)">Layer 2</label>
+             <button class="expand-button" onclick="toggleSublayer('layer2-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer2-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('f', this.checked)">F</label>
+                 </div></div><label><input type="checkbox" checked onchange="toggleLayer('vcc', this.checked)">VCC</label>
+         
+    </div>
+
+    <!-- SVG viewer -->
+    <div id="viewer">
+        <svg viewBox="0 0 410 220" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <mask id="pinholes">
+                <!-- White = visible -->
+                <rect width="410" height="220" fill="white"/>
+
+                <!-- Black = transparent holes -->
+                <circle cx="160" cy="110" r="4" fill="black"/>
+                 <circle cx="50" cy="110" r="4" fill="black"/>
+                 <circle cx="160" cy="130" r="4" fill="black"/>
+                 <circle cx="50" cy="130" r="4" fill="black"/>
+                 <circle cx="160" cy="150" r="4" fill="black"/>
+                 <circle cx="50" cy="150" r="4" fill="black"/>
+                 <circle cx="160" cy="170" r="4" fill="black"/>
+                 <circle cx="360" cy="130" r="4" fill="black"/>
+                 <circle cx="50" cy="170" r="4" fill="black"/>
+                 <circle cx="160" cy="50" r="4" fill="black"/>
+                 <circle cx="50" cy="50" r="4" fill="black"/>
+                 <circle cx="160" cy="70" r="4" fill="black"/>
+                 <circle cx="50" cy="70" r="4" fill="black"/>
+                 <circle cx="160" cy="90" r="4" fill="black"/>
+                 <circle cx="50" cy="90" r="4" fill="black"/>
+                 <circle cx="230" cy="110" r="4" fill="black"/>
+                 <circle cx="340" cy="130" r="4" fill="black"/>
+                 <circle cx="230" cy="130" r="4" fill="black"/>
+                 <circle cx="330" cy="130" r="4" fill="black"/>
+                 <circle cx="230" cy="150" r="4" fill="black"/>
+                 <circle cx="340" cy="70" r="4" fill="black"/>
+                 <circle cx="230" cy="170" r="4" fill="black"/>
+                 <circle cx="330" cy="70" r="4" fill="black"/>
+                 <circle cx="230" cy="50" r="4" fill="black"/>
+                 <circle cx="350" cy="70" r="4" fill="black"/>
+                 <circle cx="230" cy="70" r="4" fill="black"/>
+                 <circle cx="360" cy="70" r="4" fill="black"/>
+                 <circle cx="230" cy="90" r="4" fill="black"/>
+                 <circle cx="350" cy="130" r="4" fill="black"/>
+                 
+              </mask>
+            </defs>
+            <g>
+                <rect width="410" height="220" fill="#fff"/>
+            </g>
+            <g id="layer0">
+             <g id="x">
+                 <polyline points="160,110 50,110" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="160" cy="110" r="2" fill="#56B4E9"/><circle cx="50" cy="110" r="2" fill="#56B4E9"/>
+                     </g><g id="y">
+                 <polyline points="160,130 50,130" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="160" cy="130" r="2" fill="#56B4E9"/><circle cx="50" cy="130" r="2" fill="#56B4E9"/>
+                     </g><g id="z">
+                 <polyline points="160,150 50,150" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="160" cy="150" r="2" fill="#56B4E9"/><circle cx="50" cy="150" r="2" fill="#56B4E9"/>
+                     </g><g id="v">
+                 <polyline points="160,70 50,70" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="160" cy="70" r="2" fill="#56B4E9"/><circle cx="50" cy="70" r="2" fill="#56B4E9"/>
+                     </g><g id="w">
+                 <polyline points="160,90 50,90" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="160" cy="90" r="2" fill="#56B4E9"/><circle cx="50" cy="90" r="2" fill="#56B4E9"/>
+                     </g><g id="d">
+                 <polyline points="340,130 335,125 310,125 305,120 270,120 260,110 230,110" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="340" cy="130" r="2" fill="#56B4E9"/><circle cx="230" cy="110" r="2" fill="#56B4E9"/>
+                     </g><g id="e">
+                 <polyline points="230,130 330,130" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="230" cy="130" r="2" fill="#56B4E9"/><circle cx="330" cy="130" r="2" fill="#56B4E9"/>
+                     </g><g id="a">
+                 <polyline points="350,70 345,65 310,65 305,60 270,60 260,50 230,50" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="350" cy="70" r="2" fill="#56B4E9"/><circle cx="230" cy="50" r="2" fill="#56B4E9"/>
+                     </g><g id="c">
+                 <polyline points="350,130 325,105 310,105 305,100 270,100 260,90 230,90" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="350" cy="130" r="2" fill="#56B4E9"/><circle cx="230" cy="90" r="2" fill="#56B4E9"/>
+                     </g><circle cx="160" cy="110" r="2" fill="#56B4E9"/><circle cx="160" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="50" cy="110" r="2" fill="#56B4E9"/><circle cx="50" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="160" cy="130" r="2" fill="#56B4E9"/><circle cx="160" cy="130" r="1" fill="white"/>
+                 
+                 <circle cx="50" cy="130" r="2" fill="#56B4E9"/><circle cx="50" cy="130" r="1" fill="white"/>
+                 
+                 <circle cx="160" cy="150" r="2" fill="#56B4E9"/><circle cx="160" cy="150" r="1" fill="white"/>
+                 
+                 <circle cx="50" cy="150" r="2" fill="#56B4E9"/><circle cx="50" cy="150" r="1" fill="white"/>
+                 
+                 <circle cx="160" cy="70" r="2" fill="#56B4E9"/><circle cx="160" cy="70" r="1" fill="white"/>
+                 
+                 <circle cx="50" cy="70" r="2" fill="#56B4E9"/><circle cx="50" cy="70" r="1" fill="white"/>
+                 
+                 <circle cx="160" cy="90" r="2" fill="#56B4E9"/><circle cx="160" cy="90" r="1" fill="white"/>
+                 
+                 <circle cx="50" cy="90" r="2" fill="#56B4E9"/><circle cx="50" cy="90" r="1" fill="white"/>
+                 
+                 <circle cx="230" cy="110" r="2" fill="#56B4E9"/><circle cx="230" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="340" cy="130" r="2" fill="#56B4E9"/><circle cx="340" cy="130" r="1" fill="white"/>
+                 
+                 <circle cx="230" cy="130" r="2" fill="#56B4E9"/><circle cx="230" cy="130" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="130" r="2" fill="#56B4E9"/><circle cx="330" cy="130" r="1" fill="white"/>
+                 
+                 <circle cx="230" cy="50" r="2" fill="#56B4E9"/><circle cx="230" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="350" cy="70" r="2" fill="#56B4E9"/><circle cx="350" cy="70" r="1" fill="white"/>
+                 
+                 <circle cx="230" cy="90" r="2" fill="#56B4E9"/><circle cx="230" cy="90" r="1" fill="white"/>
+                 
+                 <circle cx="350" cy="130" r="2" fill="#56B4E9"/><circle cx="350" cy="130" r="1" fill="white"/>
+                 
+                 </g><g id="gnd">
+             <rect x="0" y="0" width="410" height="220" fill="#202124" mask="url(#pinholes)"/><polyline points="156,170 164,170" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="160,166 160,174" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="160" cy="170" r="2" fill="#202124"/><circle cx="160" cy="170" r="1" fill="white"/>
+                 
+                 <polyline points="356,130 364,130" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="360,126 360,134" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="360" cy="130" r="2" fill="#202124"/><circle cx="360" cy="130" r="1" fill="white"/>
+                 
+                 <polyline points="46,170 54,170" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="50,166 50,174" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="50" cy="170" r="2" fill="#202124"/><circle cx="50" cy="170" r="1" fill="white"/>
+                 
+                 
+                 </g><g id="vcc">
+             <rect x="0" y="0" width="410" height="220" fill="#FF2C2C" mask="url(#pinholes)"/><polyline points="156,50 164,50" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="160,46 160,54" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="160" cy="50" r="2" fill="#FF2C2C"/><circle cx="160" cy="50" r="1" fill="white"/>
+                 
+                 <polyline points="46,50 54,50" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="50,46 50,54" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="50" cy="50" r="2" fill="#FF2C2C"/><circle cx="50" cy="50" r="1" fill="white"/>
+                 
+                 
+                 </g><g id="layer1">
+             <g id="g">
+                 <polyline points="230,170 330,70" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="230" cy="170" r="2" fill="#009E73"/><circle cx="330" cy="70" r="2" fill="#009E73"/>
+                     </g><g id="b">
+                 <polyline points="360,70 355,65 330,65 325,70 230,70" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="360" cy="70" r="2" fill="#009E73"/><circle cx="230" cy="70" r="2" fill="#009E73"/>
+                     </g><circle cx="230" cy="170" r="2" fill="#009E73"/><circle cx="230" cy="170" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="70" r="2" fill="#009E73"/><circle cx="330" cy="70" r="1" fill="white"/>
+                 
+                 <circle cx="230" cy="70" r="2" fill="#009E73"/><circle cx="230" cy="70" r="1" fill="white"/>
+                 
+                 <circle cx="360" cy="70" r="2" fill="#009E73"/><circle cx="360" cy="70" r="1" fill="white"/>
+                 
+                 </g><g id="layer2">
+             <g id="f">
+                 <polyline points="340,70 275,135 260,135 245,150 230,150" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="340" cy="70" r="2" fill="#CC79A7"/><circle cx="230" cy="150" r="2" fill="#CC79A7"/>
+                     </g><circle cx="230" cy="150" r="2" fill="#CC79A7"/><circle cx="230" cy="150" r="1" fill="white"/>
+                 
+                 <circle cx="340" cy="70" r="2" fill="#CC79A7"/><circle cx="340" cy="70" r="1" fill="white"/>
+                 
+                 </g>
+        </svg>
+    </div>
+
+</div>
+
+<script>
+function toggleLayer(id, visible) {
+    document.getElementById(id).style.display = visible ? "inline" : "none";
+    const sublayer = document.getElementById(id + '-sublayer')
+    if(sublayer){       if(visible){
+           sublayer.classList.remove('disabled');    // Disable
+       }
+       else{
+           sublayer.classList.add('disabled');    // Enable
+       }
+    }
+}
+function toggleSublayer(id, button) {
+    const sublayer = document.getElementById(id);
+    const isExpanded = sublayer.style.display !== 'none';
+    sublayer.style.display = isExpanded ? 'none' : 'flex';
+    button.innerHTML = isExpanded ? '&#9660;' : '&#9650;';
+    button.setAttribute('aria-expanded', !isExpanded);
+}
+</script>
+
+</body>
+</html>

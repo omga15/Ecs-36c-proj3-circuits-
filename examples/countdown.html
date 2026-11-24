@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>countdown</title>
+
+<style>
+    body {
+        font-family: sans-serif;
+        margin: 20px;
+    }
+
+    .layout {
+        display: flex;
+        gap: 20px;
+        align-items: flex-start;
+    }
+
+    #controls {
+        width: 180px;
+        flex-shrink: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .sub-layers {
+        display: flex;
+        flex-direction: column;
+        margin-left: 24px;
+        padding-left: 8px;
+        border-left: 2px solid #ccc;
+    }
+
+    .sub-layers label {
+        font-size: 0.9em;
+    }
+
+    #viewer {
+        flex: 1;
+        min-width: 0;
+        border: 1px solid #ccc;
+    }
+
+    #viewer svg {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+    .layer-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    .layer-header label {
+        cursor: pointer;
+    }
+
+    .expand-button {
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        font-size: 12px;
+        padding: 4px 8px;
+    }
+
+    .expand-button:hover {
+        color: #007bff;
+    }
+.disabled {
+    opacity: 0.4;
+    pointer-events: none;
+    cursor: not-allowed;
+}
+</style>
+</head>
+
+<body>
+
+<h2>countdown</h2>
+
+<div class="layout">
+
+    <!-- Left sidebar -->
+    <div id="controls">
+        <strong>Layers</strong>
+        <label><input type="checkbox" checked onchange="toggleLayer('gnd', this.checked)">GND</label>
+         <div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer0', this.checked)">Layer 0</label>
+             <button class="expand-button" onclick="toggleSublayer('layer0-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer0-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('nzero', this.checked)">NZERO</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('oborab', this.checked)">OBORAB</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('oborabcd', this.checked)">OBORABCD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('osb', this.checked)">OSB</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('osc', this.checked)">OSC</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('osd', this.checked)">OSD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('ose', this.checked)">OSE</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tbb', this.checked)">TBB</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tborab', this.checked)">TBORAB</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tborabc', this.checked)">TBORABC</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tcd', this.checked)">TCD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tsc', this.checked)">TSC</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tsf', this.checked)">TSF</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer1', this.checked)">Layer 1</label>
+             <button class="expand-button" onclick="toggleSublayer('layer1-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer1-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('clk', this.checked)">CLK</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('cry', this.checked)">CRY</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('obb', this.checked)">OBB</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('oborcd', this.checked)">OBORCD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('osf', this.checked)">OSF</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('osg', this.checked)">OSG</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tbc', this.checked)">TBC</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tse', this.checked)">TSE</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tsg', this.checked)">TSG</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer2', this.checked)">Layer 2</label>
+             <button class="expand-button" onclick="toggleSublayer('layer2-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer2-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('cd', this.checked)">CD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('obc', this.checked)">OBC</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('osa', this.checked)">OSA</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tbd', this.checked)">TBD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tsa', this.checked)">TSA</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tsd', this.checked)">TSD</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer3', this.checked)">Layer 3</label>
+             <button class="expand-button" onclick="toggleSublayer('layer3-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer3-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('obd', this.checked)">OBD</label>
+                 <label><input type="checkbox" checked onchange="toggleLayer('tsb', this.checked)">TSB</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer4', this.checked)">Layer 4</label>
+             <button class="expand-button" onclick="toggleSublayer('layer4-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer4-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('oba', this.checked)">OBA</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer5', this.checked)">Layer 5</label>
+             <button class="expand-button" onclick="toggleSublayer('layer5-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer5-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('ld', this.checked)">LD</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer6', this.checked)">Layer 6</label>
+             <button class="expand-button" onclick="toggleSublayer('layer6-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer6-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('tba', this.checked)">TBA</label>
+                 </div></div><div class="layer-group">
+         <label><input type="checkbox" checked onchange="toggleLayer('layer7', this.checked)">Layer 7</label>
+             <button class="expand-button" onclick="toggleSublayer('layer7-sublayer', this)" aria-expanded="false">&#9660;</button>
+             <div id="layer7-sublayer" class="sub-layers" style="display: none">
+             <label><input type="checkbox" checked onchange="toggleLayer('nbro', this.checked)">NBRO</label>
+                 </div></div><label><input type="checkbox" checked onchange="toggleLayer('vcc', this.checked)">VCC</label>
+         
+    </div>
+
+    <!-- SVG viewer -->
+    <div id="viewer">
+        <svg viewBox="0 0 650 950" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <mask id="pinholes">
+                <!-- White = visible -->
+                <rect width="650" height="950" fill="white"/>
+
+                <!-- Black = transparent holes -->
+                <circle cx="50" cy="120" r="4" fill="black"/>
+                 <circle cx="330" cy="220" r="4" fill="black"/>
+                 <circle cx="330" cy="240" r="4" fill="black"/>
+                 <circle cx="330" cy="260" r="4" fill="black"/>
+                 <circle cx="330" cy="460" r="4" fill="black"/>
+                 <circle cx="390" cy="180" r="4" fill="black"/>
+                 <circle cx="390" cy="380" r="4" fill="black"/>
+                 <circle cx="390" cy="400" r="4" fill="black"/>
+                 <circle cx="390" cy="500" r="4" fill="black"/>
+                 <circle cx="390" cy="590" r="4" fill="black"/>
+                 <circle cx="390" cy="780" r="4" fill="black"/>
+                 <circle cx="430" cy="110" r="4" fill="black"/>
+                 <circle cx="520" cy="110" r="4" fill="black"/>
+                 <circle cx="540" cy="220" r="4" fill="black"/>
+                 <circle cx="540" cy="240" r="4" fill="black"/>
+                 <circle cx="540" cy="260" r="4" fill="black"/>
+                 <circle cx="540" cy="460" r="4" fill="black"/>
+                 <circle cx="600" cy="180" r="4" fill="black"/>
+                 <circle cx="600" cy="380" r="4" fill="black"/>
+                 <circle cx="600" cy="400" r="4" fill="black"/>
+                 <circle cx="600" cy="520" r="4" fill="black"/>
+                 <circle cx="600" cy="590" r="4" fill="black"/>
+                 <circle cx="600" cy="780" r="4" fill="black"/>
+                 <circle cx="50" cy="160" r="4" fill="black"/>
+                 <circle cx="330" cy="320" r="4" fill="black"/>
+                 <circle cx="330" cy="380" r="4" fill="black"/>
+                 <circle cx="330" cy="520" r="4" fill="black"/>
+                 <circle cx="330" cy="650" r="4" fill="black"/>
+                 <circle cx="330" cy="670" r="4" fill="black"/>
+                 <circle cx="330" cy="710" r="4" fill="black"/>
+                 <circle cx="330" cy="840" r="4" fill="black"/>
+                 <circle cx="330" cy="860" r="4" fill="black"/>
+                 <circle cx="330" cy="900" r="4" fill="black"/>
+                 <circle cx="390" cy="420" r="4" fill="black"/>
+                 <circle cx="390" cy="440" r="4" fill="black"/>
+                 <circle cx="390" cy="460" r="4" fill="black"/>
+                 <circle cx="390" cy="520" r="4" fill="black"/>
+                 <circle cx="390" cy="670" r="4" fill="black"/>
+                 <circle cx="390" cy="690" r="4" fill="black"/>
+                 <circle cx="390" cy="800" r="4" fill="black"/>
+                 <circle cx="390" cy="820" r="4" fill="black"/>
+                 <circle cx="390" cy="860" r="4" fill="black"/>
+                 <circle cx="390" cy="880" r="4" fill="black"/>
+                 <circle cx="540" cy="320" r="4" fill="black"/>
+                 <circle cx="540" cy="380" r="4" fill="black"/>
+                 <circle cx="540" cy="520" r="4" fill="black"/>
+                 <circle cx="540" cy="710" r="4" fill="black"/>
+                 <circle cx="540" cy="900" r="4" fill="black"/>
+                 <circle cx="600" cy="420" r="4" fill="black"/>
+                 <circle cx="600" cy="500" r="4" fill="black"/>
+                 <circle cx="600" cy="800" r="4" fill="black"/>
+                 <circle cx="600" cy="820" r="4" fill="black"/>
+                 <circle cx="600" cy="860" r="4" fill="black"/>
+                 <circle cx="600" cy="880" r="4" fill="black"/>
+                 <circle cx="50" cy="80" r="4" fill="black"/>
+                 <circle cx="390" cy="610" r="4" fill="black"/>
+                 <circle cx="280" cy="100" r="4" fill="black"/>
+                 <circle cx="390" cy="480" r="4" fill="black"/>
+                 <circle cx="600" cy="480" r="4" fill="black"/>
+                 <circle cx="330" cy="180" r="4" fill="black"/>
+                 <circle cx="330" cy="400" r="4" fill="black"/>
+                 <circle cx="600" cy="630" r="4" fill="black"/>
+                 <circle cx="330" cy="200" r="4" fill="black"/>
+                 <circle cx="330" cy="480" r="4" fill="black"/>
+                 <circle cx="600" cy="670" r="4" fill="black"/>
+                 <circle cx="330" cy="280" r="4" fill="black"/>
+                 <circle cx="330" cy="500" r="4" fill="black"/>
+                 <circle cx="330" cy="300" r="4" fill="black"/>
+                 <circle cx="330" cy="420" r="4" fill="black"/>
+                 <circle cx="600" cy="610" r="4" fill="black"/>
+                 <circle cx="330" cy="440" r="4" fill="black"/>
+                 <circle cx="330" cy="630" r="4" fill="black"/>
+                 <circle cx="330" cy="590" r="4" fill="black"/>
+                 <circle cx="330" cy="820" r="4" fill="black"/>
+                 <circle cx="330" cy="610" r="4" fill="black"/>
+                 <circle cx="390" cy="650" r="4" fill="black"/>
+                 <circle cx="540" cy="440" r="4" fill="black"/>
+                 <circle cx="330" cy="690" r="4" fill="black"/>
+                 <circle cx="330" cy="880" r="4" fill="black"/>
+                 <circle cx="390" cy="710" r="4" fill="black"/>
+                 <circle cx="390" cy="840" r="4" fill="black"/>
+                 <circle cx="390" cy="900" r="4" fill="black"/>
+                 <circle cx="600" cy="460" r="4" fill="black"/>
+                 <circle cx="600" cy="840" r="4" fill="black"/>
+                 <circle cx="600" cy="900" r="4" fill="black"/>
+                 <circle cx="330" cy="780" r="4" fill="black"/>
+                 <circle cx="330" cy="800" r="4" fill="black"/>
+                 <circle cx="600" cy="440" r="4" fill="black"/>
+                 <circle cx="390" cy="200" r="4" fill="black"/>
+                 <circle cx="410" cy="50" r="4" fill="black"/>
+                 <circle cx="390" cy="220" r="4" fill="black"/>
+                 <circle cx="400" cy="50" r="4" fill="black"/>
+                 <circle cx="390" cy="240" r="4" fill="black"/>
+                 <circle cx="420" cy="50" r="4" fill="black"/>
+                 <circle cx="390" cy="260" r="4" fill="black"/>
+                 <circle cx="430" cy="50" r="4" fill="black"/>
+                 <circle cx="390" cy="280" r="4" fill="black"/>
+                 <circle cx="420" cy="110" r="4" fill="black"/>
+                 <circle cx="390" cy="300" r="4" fill="black"/>
+                 <circle cx="410" cy="110" r="4" fill="black"/>
+                 <circle cx="390" cy="320" r="4" fill="black"/>
+                 <circle cx="400" cy="110" r="4" fill="black"/>
+                 <circle cx="390" cy="630" r="4" fill="black"/>
+                 <circle cx="540" cy="880" r="4" fill="black"/>
+                 <circle cx="490" cy="50" r="4" fill="black"/>
+                 <circle cx="600" cy="220" r="4" fill="black"/>
+                 <circle cx="490" cy="110" r="4" fill="black"/>
+                 <circle cx="600" cy="320" r="4" fill="black"/>
+                 <circle cx="500" cy="50" r="4" fill="black"/>
+                 <circle cx="600" cy="200" r="4" fill="black"/>
+                 <circle cx="500" cy="110" r="4" fill="black"/>
+                 <circle cx="600" cy="300" r="4" fill="black"/>
+                 <circle cx="510" cy="50" r="4" fill="black"/>
+                 <circle cx="600" cy="240" r="4" fill="black"/>
+                 <circle cx="510" cy="110" r="4" fill="black"/>
+                 <circle cx="600" cy="280" r="4" fill="black"/>
+                 <circle cx="520" cy="50" r="4" fill="black"/>
+                 <circle cx="600" cy="260" r="4" fill="black"/>
+                 <circle cx="540" cy="180" r="4" fill="black"/>
+                 <circle cx="540" cy="400" r="4" fill="black"/>
+                 <circle cx="540" cy="590" r="4" fill="black"/>
+                 <circle cx="540" cy="200" r="4" fill="black"/>
+                 <circle cx="540" cy="480" r="4" fill="black"/>
+                 <circle cx="540" cy="650" r="4" fill="black"/>
+                 <circle cx="540" cy="280" r="4" fill="black"/>
+                 <circle cx="540" cy="500" r="4" fill="black"/>
+                 <circle cx="540" cy="670" r="4" fill="black"/>
+                 <circle cx="540" cy="300" r="4" fill="black"/>
+                 <circle cx="540" cy="420" r="4" fill="black"/>
+                 <circle cx="540" cy="610" r="4" fill="black"/>
+                 <circle cx="540" cy="630" r="4" fill="black"/>
+                 <circle cx="540" cy="780" r="4" fill="black"/>
+                 <circle cx="540" cy="690" r="4" fill="black"/>
+                 <circle cx="540" cy="800" r="4" fill="black"/>
+                 <circle cx="540" cy="820" r="4" fill="black"/>
+                 <circle cx="540" cy="840" r="4" fill="black"/>
+                 <circle cx="540" cy="860" r="4" fill="black"/>
+                 <circle cx="600" cy="710" r="4" fill="black"/>
+                 <circle cx="600" cy="650" r="4" fill="black"/>
+                 <circle cx="600" cy="690" r="4" fill="black"/>
+                 
+              </mask>
+            </defs>
+            <g>
+                <rect width="650" height="950" fill="#fff"/>
+            </g>
+            <g id="layer0">
+             <g id="tbb">
+                 <polyline points="330,180 335,185 335,380 330,385 330,400" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="180" r="2" fill="#56B4E9"/><circle cx="330" cy="400" r="2" fill="#56B4E9"/>
+                     <polyline points="600,630 395,425 390,425 380,415 360,415 345,400 330,400" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="630" r="2" fill="#56B4E9"/><circle cx="330" cy="400" r="2" fill="#56B4E9"/>
+                     </g><g id="tcd">
+                 <polyline points="330,630 335,625 335,460 330,455 330,440" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="630" r="2" fill="#56B4E9"/><circle cx="330" cy="440" r="2" fill="#56B4E9"/>
+                     </g><g id="tsf">
+                 <polyline points="410,50 405,55 405,120 400,125 400,160 395,165 395,180 390,185 390,200" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="410" cy="50" r="2" fill="#56B4E9"/><circle cx="390" cy="200" r="2" fill="#56B4E9"/>
+                     </g><g id="tsc">
+                 <polyline points="390,280 420,250 420,110" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="390" cy="280" r="2" fill="#56B4E9"/><circle cx="420" cy="110" r="2" fill="#56B4E9"/>
+                     </g><g id="nzero">
+                 <polyline points="540,880 405,745 405,710 400,705 400,670 395,665 395,650 390,645 390,630" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="880" r="2" fill="#56B4E9"/><circle cx="390" cy="630" r="2" fill="#56B4E9"/>
+                     </g><g id="ose">
+                 <polyline points="600,320 545,265 545,260 505,220 505,190 500,185 500,150 490,140 490,110" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="320" r="2" fill="#56B4E9"/><circle cx="490" cy="110" r="2" fill="#56B4E9"/>
+                     </g><g id="osd">
+                 <polyline points="600,300 545,245 545,240 515,210 515,190 510,185 510,150 500,140 500,110" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="300" r="2" fill="#56B4E9"/><circle cx="500" cy="110" r="2" fill="#56B4E9"/>
+                     </g><g id="osc">
+                 <polyline points="600,280 545,225 545,220 525,200 525,190 520,185 520,150 510,140 510,110" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="280" r="2" fill="#56B4E9"/><circle cx="510" cy="110" r="2" fill="#56B4E9"/>
+                     </g><g id="osb">
+                 <polyline points="600,260 545,205 545,200 535,190 535,130 530,125 530,90 520,80 520,50" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="260" r="2" fill="#56B4E9"/><circle cx="520" cy="50" r="2" fill="#56B4E9"/>
+                     </g><g id="oborab">
+                 <polyline points="540,780 545,775 545,650 540,645 540,630" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="780" r="2" fill="#56B4E9"/><circle cx="540" cy="630" r="2" fill="#56B4E9"/>
+                     </g><g id="oborabcd">
+                 <polyline points="540,820 540,840" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="820" r="2" fill="#56B4E9"/><circle cx="540" cy="840" r="2" fill="#56B4E9"/>
+                     </g><g id="tborabc">
+                 <polyline points="600,710 555,755 555,780 550,785 550,820 545,825 545,840 540,845 540,860" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="710" r="2" fill="#56B4E9"/><circle cx="540" cy="860" r="2" fill="#56B4E9"/>
+                     </g><g id="tborab">
+                 <polyline points="600,690 605,685 605,670 600,665 600,650" fill="none" stroke="#56B4E9" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="690" r="2" fill="#56B4E9"/><circle cx="600" cy="650" r="2" fill="#56B4E9"/>
+                     </g><circle cx="330" cy="180" r="2" fill="#56B4E9"/><circle cx="330" cy="180" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="400" r="2" fill="#56B4E9"/><circle cx="330" cy="400" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="630" r="2" fill="#56B4E9"/><circle cx="600" cy="630" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="440" r="2" fill="#56B4E9"/><circle cx="330" cy="440" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="630" r="2" fill="#56B4E9"/><circle cx="330" cy="630" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="200" r="2" fill="#56B4E9"/><circle cx="390" cy="200" r="1" fill="white"/>
+                 
+                 <circle cx="410" cy="50" r="2" fill="#56B4E9"/><circle cx="410" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="280" r="2" fill="#56B4E9"/><circle cx="390" cy="280" r="1" fill="white"/>
+                 
+                 <circle cx="420" cy="110" r="2" fill="#56B4E9"/><circle cx="420" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="630" r="2" fill="#56B4E9"/><circle cx="390" cy="630" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="880" r="2" fill="#56B4E9"/><circle cx="540" cy="880" r="1" fill="white"/>
+                 
+                 <circle cx="490" cy="110" r="2" fill="#56B4E9"/><circle cx="490" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="320" r="2" fill="#56B4E9"/><circle cx="600" cy="320" r="1" fill="white"/>
+                 
+                 <circle cx="500" cy="110" r="2" fill="#56B4E9"/><circle cx="500" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="300" r="2" fill="#56B4E9"/><circle cx="600" cy="300" r="1" fill="white"/>
+                 
+                 <circle cx="510" cy="110" r="2" fill="#56B4E9"/><circle cx="510" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="280" r="2" fill="#56B4E9"/><circle cx="600" cy="280" r="1" fill="white"/>
+                 
+                 <circle cx="520" cy="50" r="2" fill="#56B4E9"/><circle cx="520" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="260" r="2" fill="#56B4E9"/><circle cx="600" cy="260" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="630" r="2" fill="#56B4E9"/><circle cx="540" cy="630" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="780" r="2" fill="#56B4E9"/><circle cx="540" cy="780" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="820" r="2" fill="#56B4E9"/><circle cx="540" cy="820" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="840" r="2" fill="#56B4E9"/><circle cx="540" cy="840" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="860" r="2" fill="#56B4E9"/><circle cx="540" cy="860" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="710" r="2" fill="#56B4E9"/><circle cx="600" cy="710" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="650" r="2" fill="#56B4E9"/><circle cx="600" cy="650" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="690" r="2" fill="#56B4E9"/><circle cx="600" cy="690" r="1" fill="white"/>
+                 
+                 </g><g id="layer1">
+             <g id="clk">
+                 <polyline points="390,610 385,605 385,580 55,250 55,120 50,115 50,80" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="390" cy="610" r="2" fill="#009E73"/><circle cx="50" cy="80" r="2" fill="#009E73"/>
+                     </g><g id="tbc">
+                 <polyline points="330,200 335,205 335,460 330,465 330,480" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="200" r="2" fill="#009E73"/><circle cx="330" cy="480" r="2" fill="#009E73"/>
+                     <polyline points="600,670 545,615 540,615 420,495 410,495 405,490 370,490 360,480 330,480" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="670" r="2" fill="#009E73"/><circle cx="330" cy="480" r="2" fill="#009E73"/>
+                     </g><g id="cry">
+                 <polyline points="330,820 335,815 335,610 330,605 330,590" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="820" r="2" fill="#009E73"/><circle cx="330" cy="590" r="2" fill="#009E73"/>
+                     </g><g id="tsg">
+                 <polyline points="400,50 395,55 395,200 390,205 390,220" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="400" cy="50" r="2" fill="#009E73"/><circle cx="390" cy="220" r="2" fill="#009E73"/>
+                     </g><g id="tse">
+                 <polyline points="390,320 400,310 400,110" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="390" cy="320" r="2" fill="#009E73"/><circle cx="400" cy="110" r="2" fill="#009E73"/>
+                     </g><g id="osg">
+                 <polyline points="600,220 505,125 505,80 490,65 490,50" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="220" r="2" fill="#009E73"/><circle cx="490" cy="50" r="2" fill="#009E73"/>
+                     </g><g id="osf">
+                 <polyline points="600,200 515,115 515,80 500,65 500,50" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="200" r="2" fill="#009E73"/><circle cx="500" cy="50" r="2" fill="#009E73"/>
+                     </g><g id="obb">
+                 <polyline points="540,180 545,185 545,380 540,385 540,400" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="180" r="2" fill="#009E73"/><circle cx="540" cy="400" r="2" fill="#009E73"/>
+                     <polyline points="540,590 545,585 545,420 540,415 540,400" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="590" r="2" fill="#009E73"/><circle cx="540" cy="400" r="2" fill="#009E73"/>
+                     </g><g id="oborcd">
+                 <polyline points="540,800 545,795 545,710 540,705 540,690" fill="none" stroke="#009E73" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="800" r="2" fill="#009E73"/><circle cx="540" cy="690" r="2" fill="#009E73"/>
+                     </g><circle cx="50" cy="80" r="2" fill="#009E73"/><circle cx="50" cy="80" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="610" r="2" fill="#009E73"/><circle cx="390" cy="610" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="200" r="2" fill="#009E73"/><circle cx="330" cy="200" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="480" r="2" fill="#009E73"/><circle cx="330" cy="480" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="670" r="2" fill="#009E73"/><circle cx="600" cy="670" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="590" r="2" fill="#009E73"/><circle cx="330" cy="590" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="820" r="2" fill="#009E73"/><circle cx="330" cy="820" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="220" r="2" fill="#009E73"/><circle cx="390" cy="220" r="1" fill="white"/>
+                 
+                 <circle cx="400" cy="50" r="2" fill="#009E73"/><circle cx="400" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="320" r="2" fill="#009E73"/><circle cx="390" cy="320" r="1" fill="white"/>
+                 
+                 <circle cx="400" cy="110" r="2" fill="#009E73"/><circle cx="400" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="490" cy="50" r="2" fill="#009E73"/><circle cx="490" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="220" r="2" fill="#009E73"/><circle cx="600" cy="220" r="1" fill="white"/>
+                 
+                 <circle cx="500" cy="50" r="2" fill="#009E73"/><circle cx="500" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="200" r="2" fill="#009E73"/><circle cx="600" cy="200" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="180" r="2" fill="#009E73"/><circle cx="540" cy="180" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="400" r="2" fill="#009E73"/><circle cx="540" cy="400" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="590" r="2" fill="#009E73"/><circle cx="540" cy="590" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="690" r="2" fill="#009E73"/><circle cx="540" cy="690" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="800" r="2" fill="#009E73"/><circle cx="540" cy="800" r="1" fill="white"/>
+                 
+                 </g><g id="layer2">
+             <g id="tbd">
+                 <polyline points="330,500 335,495 335,300 330,295 330,280" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="500" r="2" fill="#CC79A7"/><circle cx="330" cy="280" r="2" fill="#CC79A7"/>
+                     </g><g id="cd">
+                 <polyline points="330,610 355,635 360,635 375,650 390,650" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="610" r="2" fill="#CC79A7"/><circle cx="390" cy="650" r="2" fill="#CC79A7"/>
+                     <polyline points="540,440 400,580 400,610 395,615 395,630 390,635 390,650" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="440" r="2" fill="#CC79A7"/><circle cx="390" cy="650" r="2" fill="#CC79A7"/>
+                     </g><g id="tsa">
+                 <polyline points="420,50 395,75 395,220 390,225 390,240" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="420" cy="50" r="2" fill="#CC79A7"/><circle cx="390" cy="240" r="2" fill="#CC79A7"/>
+                     </g><g id="tsd">
+                 <polyline points="390,300 410,280 410,110" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="390" cy="300" r="2" fill="#CC79A7"/><circle cx="410" cy="110" r="2" fill="#CC79A7"/>
+                     </g><g id="osa">
+                 <polyline points="600,240 545,185 545,180 525,160 525,80 510,65 510,50" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="240" r="2" fill="#CC79A7"/><circle cx="510" cy="50" r="2" fill="#CC79A7"/>
+                     </g><g id="obc">
+                 <polyline points="540,200 545,205 545,460 540,465 540,480" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="200" r="2" fill="#CC79A7"/><circle cx="540" cy="480" r="2" fill="#CC79A7"/>
+                     <polyline points="540,650 545,645 545,500 540,495 540,480" fill="none" stroke="#CC79A7" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="650" r="2" fill="#CC79A7"/><circle cx="540" cy="480" r="2" fill="#CC79A7"/>
+                     </g><circle cx="330" cy="280" r="2" fill="#CC79A7"/><circle cx="330" cy="280" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="500" r="2" fill="#CC79A7"/><circle cx="330" cy="500" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="610" r="2" fill="#CC79A7"/><circle cx="330" cy="610" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="650" r="2" fill="#CC79A7"/><circle cx="390" cy="650" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="440" r="2" fill="#CC79A7"/><circle cx="540" cy="440" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="240" r="2" fill="#CC79A7"/><circle cx="390" cy="240" r="1" fill="white"/>
+                 
+                 <circle cx="420" cy="50" r="2" fill="#CC79A7"/><circle cx="420" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="300" r="2" fill="#CC79A7"/><circle cx="390" cy="300" r="1" fill="white"/>
+                 
+                 <circle cx="410" cy="110" r="2" fill="#CC79A7"/><circle cx="410" cy="110" r="1" fill="white"/>
+                 
+                 <circle cx="510" cy="50" r="2" fill="#CC79A7"/><circle cx="510" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="240" r="2" fill="#CC79A7"/><circle cx="600" cy="240" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="200" r="2" fill="#CC79A7"/><circle cx="540" cy="200" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="480" r="2" fill="#CC79A7"/><circle cx="540" cy="480" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="650" r="2" fill="#CC79A7"/><circle cx="540" cy="650" r="1" fill="white"/>
+                 
+                 </g><g id="layer3">
+             <g id="tsb">
+                 <polyline points="430,50 395,85 395,240 390,245 390,260" fill="none" stroke="#E69F00" stroke-width="2" stroke-linejoin="round" /><circle cx="430" cy="50" r="2" fill="#E69F00"/><circle cx="390" cy="260" r="2" fill="#E69F00"/>
+                     </g><g id="obd">
+                 <polyline points="540,280 545,285 545,480 540,485 540,500" fill="none" stroke="#E69F00" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="280" r="2" fill="#E69F00"/><circle cx="540" cy="500" r="2" fill="#E69F00"/>
+                     <polyline points="540,670 545,665 545,520 540,515 540,500" fill="none" stroke="#E69F00" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="670" r="2" fill="#E69F00"/><circle cx="540" cy="500" r="2" fill="#E69F00"/>
+                     </g><circle cx="390" cy="260" r="2" fill="#E69F00"/><circle cx="390" cy="260" r="1" fill="white"/>
+                 
+                 <circle cx="430" cy="50" r="2" fill="#E69F00"/><circle cx="430" cy="50" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="280" r="2" fill="#E69F00"/><circle cx="540" cy="280" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="500" r="2" fill="#E69F00"/><circle cx="540" cy="500" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="670" r="2" fill="#E69F00"/><circle cx="540" cy="670" r="1" fill="white"/>
+                 
+                 </g><g id="gnd">
+             <rect x="0" y="0" width="650" height="950" fill="#202124" mask="url(#pinholes)"/><polyline points="46,160 54,160" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="50,156 50,164" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="50" cy="160" r="2" fill="#202124"/><circle cx="50" cy="160" r="1" fill="white"/>
+                 
+                 <polyline points="326,320 334,320" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,316 330,324" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="320" r="2" fill="#202124"/><circle cx="330" cy="320" r="1" fill="white"/>
+                 
+                 <polyline points="326,380 334,380" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,376 330,384" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="380" r="2" fill="#202124"/><circle cx="330" cy="380" r="1" fill="white"/>
+                 
+                 <polyline points="326,520 334,520" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,516 330,524" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="520" r="2" fill="#202124"/><circle cx="330" cy="520" r="1" fill="white"/>
+                 
+                 <polyline points="326,650 334,650" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,646 330,654" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="650" r="2" fill="#202124"/><circle cx="330" cy="650" r="1" fill="white"/>
+                 
+                 <polyline points="326,670 334,670" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,666 330,674" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="670" r="2" fill="#202124"/><circle cx="330" cy="670" r="1" fill="white"/>
+                 
+                 <polyline points="326,710 334,710" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,706 330,714" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="710" r="2" fill="#202124"/><circle cx="330" cy="710" r="1" fill="white"/>
+                 
+                 <polyline points="326,840 334,840" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,836 330,844" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="840" r="2" fill="#202124"/><circle cx="330" cy="840" r="1" fill="white"/>
+                 
+                 <polyline points="326,860 334,860" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,856 330,864" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="860" r="2" fill="#202124"/><circle cx="330" cy="860" r="1" fill="white"/>
+                 
+                 <polyline points="326,900 334,900" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="330,896 330,904" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="900" r="2" fill="#202124"/><circle cx="330" cy="900" r="1" fill="white"/>
+                 
+                 <polyline points="386,420 394,420" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,416 390,424" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="420" r="2" fill="#202124"/><circle cx="390" cy="420" r="1" fill="white"/>
+                 
+                 <polyline points="386,440 394,440" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,436 390,444" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="440" r="2" fill="#202124"/><circle cx="390" cy="440" r="1" fill="white"/>
+                 
+                 <polyline points="386,460 394,460" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,456 390,464" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="460" r="2" fill="#202124"/><circle cx="390" cy="460" r="1" fill="white"/>
+                 
+                 <polyline points="386,520 394,520" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,516 390,524" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="520" r="2" fill="#202124"/><circle cx="390" cy="520" r="1" fill="white"/>
+                 
+                 <polyline points="386,670 394,670" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,666 390,674" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="670" r="2" fill="#202124"/><circle cx="390" cy="670" r="1" fill="white"/>
+                 
+                 <polyline points="386,690 394,690" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,686 390,694" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="690" r="2" fill="#202124"/><circle cx="390" cy="690" r="1" fill="white"/>
+                 
+                 <polyline points="386,800 394,800" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,796 390,804" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="800" r="2" fill="#202124"/><circle cx="390" cy="800" r="1" fill="white"/>
+                 
+                 <polyline points="386,820 394,820" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,816 390,824" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="820" r="2" fill="#202124"/><circle cx="390" cy="820" r="1" fill="white"/>
+                 
+                 <polyline points="386,860 394,860" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,856 390,864" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="860" r="2" fill="#202124"/><circle cx="390" cy="860" r="1" fill="white"/>
+                 
+                 <polyline points="386,880 394,880" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="390,876 390,884" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="880" r="2" fill="#202124"/><circle cx="390" cy="880" r="1" fill="white"/>
+                 
+                 <polyline points="536,320 544,320" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="540,316 540,324" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="320" r="2" fill="#202124"/><circle cx="540" cy="320" r="1" fill="white"/>
+                 
+                 <polyline points="536,380 544,380" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="540,376 540,384" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="380" r="2" fill="#202124"/><circle cx="540" cy="380" r="1" fill="white"/>
+                 
+                 <polyline points="536,520 544,520" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="540,516 540,524" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="520" r="2" fill="#202124"/><circle cx="540" cy="520" r="1" fill="white"/>
+                 
+                 <polyline points="536,710 544,710" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="540,706 540,714" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="710" r="2" fill="#202124"/><circle cx="540" cy="710" r="1" fill="white"/>
+                 
+                 <polyline points="536,900 544,900" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="540,896 540,904" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="900" r="2" fill="#202124"/><circle cx="540" cy="900" r="1" fill="white"/>
+                 
+                 <polyline points="596,420 604,420" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="600,416 600,424" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="420" r="2" fill="#202124"/><circle cx="600" cy="420" r="1" fill="white"/>
+                 
+                 <polyline points="596,500 604,500" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="600,496 600,504" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="500" r="2" fill="#202124"/><circle cx="600" cy="500" r="1" fill="white"/>
+                 
+                 <polyline points="596,800 604,800" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="600,796 600,804" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="800" r="2" fill="#202124"/><circle cx="600" cy="800" r="1" fill="white"/>
+                 
+                 <polyline points="596,820 604,820" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="600,816 600,824" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="820" r="2" fill="#202124"/><circle cx="600" cy="820" r="1" fill="white"/>
+                 
+                 <polyline points="596,860 604,860" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="600,856 600,864" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="860" r="2" fill="#202124"/><circle cx="600" cy="860" r="1" fill="white"/>
+                 
+                 <polyline points="596,880 604,880" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><polyline points="600,876 600,884" fill="none" stroke="#202124" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="880" r="2" fill="#202124"/><circle cx="600" cy="880" r="1" fill="white"/>
+                 
+                 
+                 </g><g id="vcc">
+             <rect x="0" y="0" width="650" height="950" fill="#FF2C2C" mask="url(#pinholes)"/><polyline points="46,120 54,120" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="50,116 50,124" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="50" cy="120" r="2" fill="#FF2C2C"/><circle cx="50" cy="120" r="1" fill="white"/>
+                 
+                 <polyline points="326,220 334,220" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="330,216 330,224" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="220" r="2" fill="#FF2C2C"/><circle cx="330" cy="220" r="1" fill="white"/>
+                 
+                 <polyline points="326,240 334,240" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="330,236 330,244" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="240" r="2" fill="#FF2C2C"/><circle cx="330" cy="240" r="1" fill="white"/>
+                 
+                 <polyline points="326,260 334,260" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="330,256 330,264" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="260" r="2" fill="#FF2C2C"/><circle cx="330" cy="260" r="1" fill="white"/>
+                 
+                 <polyline points="326,460 334,460" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="330,456 330,464" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="330" cy="460" r="2" fill="#FF2C2C"/><circle cx="330" cy="460" r="1" fill="white"/>
+                 
+                 <polyline points="386,180 394,180" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="390,176 390,184" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="180" r="2" fill="#FF2C2C"/><circle cx="390" cy="180" r="1" fill="white"/>
+                 
+                 <polyline points="386,380 394,380" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="390,376 390,384" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="380" r="2" fill="#FF2C2C"/><circle cx="390" cy="380" r="1" fill="white"/>
+                 
+                 <polyline points="386,400 394,400" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="390,396 390,404" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="400" r="2" fill="#FF2C2C"/><circle cx="390" cy="400" r="1" fill="white"/>
+                 
+                 <polyline points="386,500 394,500" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="390,496 390,504" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="500" r="2" fill="#FF2C2C"/><circle cx="390" cy="500" r="1" fill="white"/>
+                 
+                 <polyline points="386,590 394,590" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="390,586 390,594" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="590" r="2" fill="#FF2C2C"/><circle cx="390" cy="590" r="1" fill="white"/>
+                 
+                 <polyline points="386,780 394,780" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="390,776 390,784" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="390" cy="780" r="2" fill="#FF2C2C"/><circle cx="390" cy="780" r="1" fill="white"/>
+                 
+                 <polyline points="426,110 434,110" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="430,106 430,114" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="430" cy="110" r="2" fill="#FF2C2C"/><circle cx="430" cy="110" r="1" fill="white"/>
+                 
+                 <polyline points="516,110 524,110" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="520,106 520,114" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="520" cy="110" r="2" fill="#FF2C2C"/><circle cx="520" cy="110" r="1" fill="white"/>
+                 
+                 <polyline points="536,220 544,220" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="540,216 540,224" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="220" r="2" fill="#FF2C2C"/><circle cx="540" cy="220" r="1" fill="white"/>
+                 
+                 <polyline points="536,240 544,240" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="540,236 540,244" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="240" r="2" fill="#FF2C2C"/><circle cx="540" cy="240" r="1" fill="white"/>
+                 
+                 <polyline points="536,260 544,260" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="540,256 540,264" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="260" r="2" fill="#FF2C2C"/><circle cx="540" cy="260" r="1" fill="white"/>
+                 
+                 <polyline points="536,460 544,460" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="540,456 540,464" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="540" cy="460" r="2" fill="#FF2C2C"/><circle cx="540" cy="460" r="1" fill="white"/>
+                 
+                 <polyline points="596,180 604,180" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="600,176 600,184" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="180" r="2" fill="#FF2C2C"/><circle cx="600" cy="180" r="1" fill="white"/>
+                 
+                 <polyline points="596,380 604,380" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="600,376 600,384" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="380" r="2" fill="#FF2C2C"/><circle cx="600" cy="380" r="1" fill="white"/>
+                 
+                 <polyline points="596,400 604,400" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="600,396 600,404" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="400" r="2" fill="#FF2C2C"/><circle cx="600" cy="400" r="1" fill="white"/>
+                 
+                 <polyline points="596,520 604,520" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="600,516 600,524" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="520" r="2" fill="#FF2C2C"/><circle cx="600" cy="520" r="1" fill="white"/>
+                 
+                 <polyline points="596,590 604,590" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="600,586 600,594" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="590" r="2" fill="#FF2C2C"/><circle cx="600" cy="590" r="1" fill="white"/>
+                 
+                 <polyline points="596,780 604,780" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><polyline points="600,776 600,784" fill="none" stroke="#FF2C2C" stroke-width="4" stroke-linejoin="round" /><circle cx="600" cy="780" r="2" fill="#FF2C2C"/><circle cx="600" cy="780" r="1" fill="white"/>
+                 
+                 
+                 </g><g id="layer4">
+             <g id="oba">
+                 <polyline points="540,300 545,305 545,400 540,405 540,420" fill="none" stroke="#0072B2" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="300" r="2" fill="#0072B2"/><circle cx="540" cy="420" r="2" fill="#0072B2"/>
+                     <polyline points="540,610 545,605 545,440 540,435 540,420" fill="none" stroke="#0072B2" stroke-width="2" stroke-linejoin="round" /><circle cx="540" cy="610" r="2" fill="#0072B2"/><circle cx="540" cy="420" r="2" fill="#0072B2"/>
+                     </g><circle cx="540" cy="300" r="2" fill="#0072B2"/><circle cx="540" cy="300" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="420" r="2" fill="#0072B2"/><circle cx="540" cy="420" r="1" fill="white"/>
+                 
+                 <circle cx="540" cy="610" r="2" fill="#0072B2"/><circle cx="540" cy="610" r="1" fill="white"/>
+                 
+                 </g><g id="layer5">
+             <g id="ld">
+                 <polyline points="280,100 385,205 385,460 390,465 390,480" fill="none" stroke="#F0E442" stroke-width="2" stroke-linejoin="round" /><circle cx="280" cy="100" r="2" fill="#F0E442"/><circle cx="390" cy="480" r="2" fill="#F0E442"/>
+                     <polyline points="600,480 595,475 540,475 535,480 390,480" fill="none" stroke="#F0E442" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="480" r="2" fill="#F0E442"/><circle cx="390" cy="480" r="2" fill="#F0E442"/>
+                     </g><circle cx="280" cy="100" r="2" fill="#F0E442"/><circle cx="280" cy="100" r="1" fill="white"/>
+                 
+                 <circle cx="390" cy="480" r="2" fill="#F0E442"/><circle cx="390" cy="480" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="480" r="2" fill="#F0E442"/><circle cx="600" cy="480" r="1" fill="white"/>
+                 
+                 </g><g id="layer6">
+             <g id="tba">
+                 <polyline points="330,300 335,305 335,400 330,405 330,420" fill="none" stroke="#9B72CF" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="300" r="2" fill="#9B72CF"/><circle cx="330" cy="420" r="2" fill="#9B72CF"/>
+                     <polyline points="600,610 425,435 410,435 405,430 370,430 360,420 330,420" fill="none" stroke="#9B72CF" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="610" r="2" fill="#9B72CF"/><circle cx="330" cy="420" r="2" fill="#9B72CF"/>
+                     </g><circle cx="330" cy="300" r="2" fill="#9B72CF"/><circle cx="330" cy="300" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="420" r="2" fill="#9B72CF"/><circle cx="330" cy="420" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="610" r="2" fill="#9B72CF"/><circle cx="600" cy="610" r="1" fill="white"/>
+                 
+                 </g><g id="layer7">
+             <g id="nbro">
+                 <polyline points="330,800 330,780" fill="none" stroke="#D55E00" stroke-width="2" stroke-linejoin="round" /><circle cx="330" cy="800" r="2" fill="#D55E00"/><circle cx="330" cy="780" r="2" fill="#D55E00"/>
+                     <polyline points="600,440 545,495 545,500 340,705 340,740 330,750 330,780" fill="none" stroke="#D55E00" stroke-width="2" stroke-linejoin="round" /><circle cx="600" cy="440" r="2" fill="#D55E00"/><circle cx="330" cy="780" r="2" fill="#D55E00"/>
+                     </g><circle cx="330" cy="780" r="2" fill="#D55E00"/><circle cx="330" cy="780" r="1" fill="white"/>
+                 
+                 <circle cx="330" cy="800" r="2" fill="#D55E00"/><circle cx="330" cy="800" r="1" fill="white"/>
+                 
+                 <circle cx="600" cy="440" r="2" fill="#D55E00"/><circle cx="600" cy="440" r="1" fill="white"/>
+                 
+                 </g>
+        </svg>
+    </div>
+
+</div>
+
+<script>
+function toggleLayer(id, visible) {
+    document.getElementById(id).style.display = visible ? "inline" : "none";
+    const sublayer = document.getElementById(id + '-sublayer')
+    if(sublayer){       if(visible){
+           sublayer.classList.remove('disabled');    // Disable
+       }
+       else{
+           sublayer.classList.add('disabled');    // Enable
+       }
+    }
+}
+function toggleSublayer(id, button) {
+    const sublayer = document.getElementById(id);
+    const isExpanded = sublayer.style.display !== 'none';
+    sublayer.style.display = isExpanded ? 'none' : 'flex';
+    button.innerHTML = isExpanded ? '&#9660;' : '&#9650;';
+    button.setAttribute('aria-expanded', !isExpanded);
+}
+</script>
+
+</body>
+</html>
