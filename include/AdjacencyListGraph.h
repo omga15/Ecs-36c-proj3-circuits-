@@ -75,6 +75,10 @@ class CAdjacencyListGraph : public virtual CFullMutableGraph{
         // Returns true if the edge exists and its weight was updated.
         bool SetEdgeWeight(TVertexID src, TVertexID dest, double weight) noexcept override;
 
+        // Attempts to color the graph with at most maxcolors.
+        // Returns true if the vertex exists and its tag was updated.
+        bool ColorVertices(std::size_t maxcolors, bool keepcurrent = false, bool keepbest = false) noexcept override;
+
 };
 
 #endif

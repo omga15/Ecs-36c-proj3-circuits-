@@ -36,7 +36,42 @@ protected:
     static CEdgeMutableGraph* EdgeMutable(CGraph* graph){
         return dynamic_cast<CEdgeMutableGraph*>(graph);
     }
+
+    static CColorableMutableGraph* Colorable(CGraph* graph){
+        return dynamic_cast<CColorableMutableGraph*>(graph);
+    }
+
+    static void VerifyColoring(
+        CGraph* graph,
+        std::size_t maxcolors){
+
+        std::vector<TGraphVertexID> vertices;
+        for(TGraphVertexID VertexID = 0; VertexID < graph->VertexCount(); VertexID++){
+            vertices.push_back(VertexID);
+        }
+        
+
+        for(auto vertex : vertices){
+            TGraphVertexTag tag = 0;
+            ASSERT_TRUE(graph->GetVertexTag(vertex, tag));
+            EXPECT_LT(tag, maxcolors);
+
+            std::vector<TGraphVertexID> neighbors;
+            ASSERT_TRUE(graph->GetVertexNeighbors(vertex, neighbors));
+
+            for(auto neighbor : neighbors){
+                TGraphVertexTag neighborTag = 0;
+                ASSERT_TRUE(graph->GetVertexTag(neighbor, neighborTag));
+                EXPECT_NE(tag, neighborTag)
+                    << "Adjacent vertices " << vertex
+                    << " and " << neighbor
+                    << " have the same color";
+            }
+        }
+    }
 };
+
+
 
 // Replace CYourGraphImplementation with your concrete implementation types.
 using MutableGraphImplementations =
@@ -323,4 +358,121 @@ TYPED_TEST(MutableGraphInterfaceTest, SetEdgeWeightDoesNotChangeEdgeCount){
     ASSERT_TRUE(mutableGraph->SetEdgeWeight(0, 1, 9.0));
 
     EXPECT_TRUE(graph->EdgeExists(0, 1));
+}
+
+// -----------------------------------------------------------------------------
+// CColorableMutableGraph
+// -----------------------------------------------------------------------------
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesSingleVertex){
+    auto graph = TestFixture::CreateGraph({99});
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_TRUE(colorable->ColorVertices(1));
+    auto DefaultTag = std::numeric_limits<TGraphVertexTag>::max();
+    CGraph::TVertexTag tag = DefaultTag;
+    ASSERT_TRUE(graph->GetVertexTag(0, tag));
+    EXPECT_EQ(tag, 0);
+}
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesSimpleEdge){
+    const std::vector<TGraphEdge> edges = {
+        {0, 1, 1.0, true}
+    };
+    auto DefaultTag = std::numeric_limits<TGraphVertexTag>::max();
+    auto graph = TestFixture::CreateGraph({DefaultTag,DefaultTag}, edges);
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_TRUE(colorable->ColorVertices(2));
+
+    TestFixture::VerifyColoring(graph.get(), 2);
+}
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesTriangle){
+    const std::vector<TGraphEdge> edges = {
+        {0, 1, 1.0, true},
+        {1, 2, 1.0, true},
+        {2, 0, 1.0, true}
+    };
+    auto DefaultTag = std::numeric_limits<TGraphVertexTag>::max();
+    auto graph = TestFixture::CreateGraph({DefaultTag, DefaultTag, DefaultTag}, edges);
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_TRUE(colorable->ColorVertices(3));
+
+    TestFixture::VerifyColoring(graph.get(), 3);
+}
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesTriangleWithInsufficientColors){
+    const std::vector<TGraphEdge> edges = {
+        {0, 1, 1.0, true},
+        {1, 2, 1.0, true},
+        {2, 0, 1.0, true}
+    };
+    auto DefaultTag = std::numeric_limits<TGraphVertexTag>::max();
+    auto graph = TestFixture::CreateGraph({DefaultTag, DefaultTag, DefaultTag}, edges);
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_FALSE(colorable->ColorVertices(2));
+}
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesZeroColors){
+    auto graph = TestFixture::CreateGraph({std::numeric_limits<TGraphVertexTag>::max()});
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_FALSE(colorable->ColorVertices(0));
+}
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesDisconnectedGraph){
+    const std::vector<TGraphEdge> edges = {
+        {0, 1, 1.0, true},
+        {2, 3, 1.0, true}
+    };
+
+    auto DefaultTag = std::numeric_limits<TGraphVertexTag>::max();
+    auto graph = TestFixture::CreateGraph(
+        {DefaultTag, DefaultTag, DefaultTag, DefaultTag}, edges);
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_TRUE(colorable->ColorVertices(2));
+
+    TestFixture::VerifyColoring(graph.get(), 2);
+}
+
+TYPED_TEST(MutableGraphInterfaceTest, ColorVerticesStartingVertexChangesOrder){
+    const std::vector<TGraphEdge> edges = {
+        {0, 1, 1.0, true},
+        {1, 2, 1.0, true},
+        {2, 3, 1.0, true}
+    };
+
+    auto DefaultTag = std::numeric_limits<TGraphVertexTag>::max();
+    auto graph = TestFixture::CreateGraph(
+        {DefaultTag, DefaultTag, DefaultTag, DefaultTag}, edges);
+    ASSERT_NE(graph, nullptr);
+
+    auto* colorable = TestFixture::Colorable(graph.get());
+    ASSERT_NE(colorable, nullptr);
+
+    EXPECT_TRUE(colorable->ColorVertices(2));
+
+    TestFixture::VerifyColoring(graph.get(), 2);
 }

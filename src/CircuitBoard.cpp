@@ -1,44 +1,83 @@
+#include <memory>
+#include <vector>
+#include <cstddef>
 #include "CircuitBoard.h"
-#include "CircuitLayer.h"
-#include "CircuitNetlist.h"
 
 struct CCircuitBoard::SImplementation{
+    CCircuitNetlist DNetlist;
+    std::vector<CCircuitLayer> DLayers;
+    std::size_t DPerimeter = 0;
 
-        // Returns the board max dimensions
-        SCircuitLocation Dimensions() const;
+    // Returns the board max dimensions
+    SCircuitLocation Dimensions() const{
+        return SCircuitLocation{};
+    }
 
-        // Returns the total number of layers in the board.
-        TLayerCoordinate LayerCount() const;
+    // Returns the total number of layers in the board.
+    TLayerCoordinate LayerCount() const{
+        
+        return TLayerCoordinate{};
+    }
 
-        // Returns allowed perimeter around the edges of the extreme edge components
-        std::size_t Perimeter() const;
+    // Returns allowed perimeter around the edges of the extreme edge components
+    std::size_t Perimeter() const{
+        // TODO
+        return DPerimeter;
+    }
 
-        // Sets allowed perimeter around the edges of the extreme edge components
-        std::size_t Perimeter(std::size_t perimeter);
+    // Sets allowed perimeter around the edges of the extreme edge components
+    std::size_t Perimeter(std::size_t perimeter){
+        // TODO
+        DPerimeter = perimeter;
+        return DPerimeter;
+    }
 
-        // Gets the layer at the specified index.
-        // Returns true if the index is valid and the layer was retrieved.
-        bool Layer(TLayerCoordinate index, CCircuitLayer &layer) const;
+    // Gets the layer at the specified index.
+    // Returns true if the index is valid and the layer was retrieved.
+    bool Layer(TLayerCoordinate index, CCircuitLayer &layer) const{
+        // TODO
+        return false;
+    }
 
-        // Creates a circuit board with all the pins specified in the netlist, and a layer for each net.
-        static CCircuitBoard CreateBoardFromNetlist(const CCircuitNetlist &netlist);
+    // Sets up a circuit board with all the pins specified in the netlist, and a layer for each net.
+    void InitFromNetlist(const CCircuitNetlist &netlist){
+        // TODO
+        DNetlist = netlist;
+    }
 
-        // Creates a circuit board with all the pins specified in the netlist, and a layer for each net.
-        static CCircuitBoard CreateBoardFromNetlistAndLayers(const CCircuitNetlist &netlist, const std::vector<CCircuitLayer> &layers);
+    // Sets up a circuit board with all the pins specified in the netlist, and a layer for each net.
+    void InitFromNetlistAndLayers(const CCircuitNetlist &netlist, const std::vector<CCircuitLayer> &layers){
+        // TODO
+        DNetlist = netlist;
+        DLayers = layers;
+    }
 
-        // Returns the netlist that the board was created from
-        const CCircuitNetlist &Netlist() const;
+    // Returns the netlist that the board was created from
+    const CCircuitNetlist &Netlist() const{
+        // TODO
+        return DNetlist;
+    }
 
-        // Creates connected nets one on each layer
-        bool CreateLayerNets();
+    // Creates connected nets one on each layer
+    bool CreateLayerNets(){
+        // TODO
+        return false;
+    }
 
-        // Minimizes the number of layers given the existing nets
-        bool MinimizeLayers();
+    // Minimizes the number of layers given the existing nets
+    bool MinimizeLayers(){
+        // TODO
+        return false;
+    }
 
-        // Reroute and optimize layers
-        bool RerouteAndOptimizeLayers();
-
+    // Reroute and optimize layers
+    bool RerouteAndOptimizeLayers(){
+        // TODO
+        return false;
+    }
 };
+
+
 
 // Creates an empty circuit board.
 CCircuitBoard::CCircuitBoard(){
@@ -47,57 +86,89 @@ CCircuitBoard::CCircuitBoard(){
 
 // Creates a copy of another circuit board.
 CCircuitBoard::CCircuitBoard(const CCircuitBoard &board){
-    DImplementation = std::make_unique<SImplementation>(board);
+    DImplementation = std::make_unique<SImplementation>(*board.DImplementation);
 }
 
 // Transfers ownership of another circuit board's data.
-CCircuitBoard::CCircuitBoard(CCircuitBoard &&board){
-
+CCircuitBoard::CCircuitBoard(CCircuitBoard &&board){ 
+    DImplementation = std::move(board.DImplementation);
 }
 
 // Cleans up the circuit board and its internal implementation.
-CCircuitBoard::~CCircuitBoard();
+CCircuitBoard::~CCircuitBoard() = default;
 
 // Replaces this net with a copy of another board.
-CCircuitBoard::CCircuitBoard &operator=(const CCircuitBoard &board);
+CCircuitBoard &CCircuitBoard::operator=(const CCircuitBoard &board){
+    if(this != &board){
+        DImplementation = std::make_unique<SImplementation>(*board.DImplementation);
+    }
+    return *this;
+}
 
 // Transfers another boards's data into this board.
-CCircuitBoard::CCircuitBoard &operator=(CCircuitBoard &&board) noexcept;
+CCircuitBoard &CCircuitBoard::operator=(CCircuitBoard &&board) noexcept{
+    if(this != &board){
+        DImplementation = std::move(board.DImplementation);
+    }
+    return *this;
+}
 
 // Returns the board max dimensions
 SCircuitLocation CCircuitBoard::Dimensions() const{
-    return Dimpl
+    return DImplementation->Dimensions();
 }
 
 // Returns the total number of layers in the board.
-TLayerCoordinate CCircuitBoard:LayerCount() const{}
+TLayerCoordinate CCircuitBoard::LayerCount() const{
+    return DImplementation->LayerCount();
+}
 
 // Returns allowed perimeter around the edges of the extreme edge components
-std::size_t CCircuitBoard::Perimeter() const{}
+std::size_t CCircuitBoard::Perimeter() const{
+    return DImplementation->Perimeter();
+}
 
 // Sets allowed perimeter around the edges of the extreme edge components
-std::size_t CCircuitBoard::Perimeter(std::size_t perimeter){}
+std::size_t CCircuitBoard::Perimeter(std::size_t perimeter){
+    return DImplementation->Perimeter(perimeter);
+}
 
 // Gets the layer at the specified index.
 // Returns true if the index is valid and the layer was retrieved.
-CCircuitBoard::bool Layer(TLayerCoordinate index, CCircuitLayer &layer) const{}
-
-// Creates a circuit board with all the pins specified in the netlist, and a layer for each net.
-static CCircuitBoard CCircuitBoard::CreateBoardFromNetlist(const CCircuitNetlist &netlist){
-    
+bool CCircuitBoard::Layer(TLayerCoordinate index, CCircuitLayer &layer) const{
+    return DImplementation->Layer(index, layer);
 }
 
 // Creates a circuit board with all the pins specified in the netlist, and a layer for each net.
-static CCircuitBoard CCircuitBoard::CreateBoardFromNetlistAndLayers(const CCircuitNetlist &netlist, const std::vector<CCircuitLayer> &layers){}
+CCircuitBoard CCircuitBoard::CreateBoardFromNetlist(const CCircuitNetlist &netlist){
+    CCircuitBoard Board;
+    Board.DImplementation->InitFromNetlist(netlist);
+    return Board;
+}
+
+// Creates a circuit board with all the pins specified in the netlist, and a layer for each net.
+CCircuitBoard CCircuitBoard::CreateBoardFromNetlistAndLayers(const CCircuitNetlist &netlist, const std::vector<CCircuitLayer> &layers){
+    CCircuitBoard Board;
+    Board.DImplementation->InitFromNetlistAndLayers(netlist, layers);
+    return Board;
+}
 
 // Returns the netlist that the board was created from
-const CCircuitBoard::CCircuitNetlist &Netlist() const{}
+const CCircuitNetlist &CCircuitBoard::Netlist() const{
+    return DImplementation->Netlist();
+}
 
 // Creates connected nets one on each layer
-bool CCircuitBoard::CreateLayerNets(){}
+bool CCircuitBoard::CreateLayerNets(){
+    return DImplementation->CreateLayerNets();
+}
 
 // Minimizes the number of layers given the existing nets
-bool CCircuitBoard::MinimizeLayers(){}
+bool CCircuitBoard::MinimizeLayers(){
+    return DImplementation->MinimizeLayers();
+}
 
 // Reroute and optimize layers
-bool CCircuitBoard::RerouteAndOptimizeLayers(){}
+bool CCircuitBoard::RerouteAndOptimizeLayers(){
+    return DImplementation->RerouteAndOptimizeLayers();
+}

@@ -50,8 +50,19 @@ class CEdgeMutableGraph : public virtual CGraph{
         virtual bool SetEdgeWeight(TVertexID src, TVertexID dest, double weight) noexcept = 0;
 };
 
+// Interface for graphs that allow vertex tags to be modified.
+class CColorableMutableGraph : public virtual CGraph{
+    public:
+        // Virtual destructor for proper cleanup of derived graph classes.
+        virtual ~CColorableMutableGraph() = default;
+
+        // Attempts to color the graph with at most maxcolors.
+        // Returns true if the vertex exists and its tag was updated.
+        virtual bool ColorVertices(std::size_t maxcolors, bool keepcurrent = false, bool keepbest = false) noexcept = 0;
+};
+
 // Interface for graphs that allow all types of mutation.
-class CFullMutableGraph : public virtual CVertexMutableGraph, public virtual CVertexTagMutableGraph, public virtual CEdgeMutableGraph{
+class CFullMutableGraph : public virtual CVertexMutableGraph, public virtual CVertexTagMutableGraph, public virtual CEdgeMutableGraph, public virtual CColorableMutableGraph{
     public:
         // Virtual destructor for proper cleanup of derived graph classes.
         virtual ~CFullMutableGraph() = default;
