@@ -2,12 +2,13 @@
 #include <vector>
 #include <cstddef>
 #include "CircuitNetlist.h"
-#include "CircuitBoardDefinitions.h"
 
-struct CCircuitNetlist::SImplementation{
-    // TODO: add whatever internal state you need
+struct CCircuitNetlist::SImplementation{ 
+    // Type used to identify circuits in the netlist.
+    using TCircuitID = std::size_t;
 
-    // ---- Implement your logic here ----
+    // Type used to identify pins within a circuit.
+    using TPinID = std::size_t;
 
     // Returns the total number of circuits in the netlist.
     std::size_t CircuitCount() const{

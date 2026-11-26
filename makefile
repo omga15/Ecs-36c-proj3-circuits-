@@ -88,6 +88,9 @@ all: make_directories 			\
 	run_testgridgraph			\
 	run_testcircuit_trace		\
 	run_testcircuit_net 		\
+	run_testcircuit_layer		\
+	run_testcircuit_board		\
+	run_testcircuit_netlist		\
 	generate_coverage 			\
 	$(ANALYSIS_TARGET)
 	

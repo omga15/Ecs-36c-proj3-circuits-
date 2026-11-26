@@ -318,11 +318,51 @@ struct CAdjacencyListGraph::SImplementation{
 
     // Attempts to color the graph with at most maxcolors.
     // Returns true if the vertex exists and its tag was updated.
-    bool ColorVertices(std::size_t maxcolors, bool keepcurrent, bool keepbest) noexcept{
-        //TODO
+    
+    bool IsValidColor(TVertexID id, TVertexTag color, const std::vector<TVertexTag> &colors){
+        for(auto &Edge : DVertices[id].DEdges){
+            if(color == colors[Edge.DDestination]){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool ColorVertex(TVertexID id, std::size_t maxcolors, std::vector<TVertexTag> &colors){
+        if(id >= DVertices.size()){
+            return true;
+        }
+        if(colors[id] != std::numeric_limits<TVertexTag>::max()){
+            return ColorVertex(id+1,maxcolors,colors);
+        }
+        for(std::size_t Color = 0; Color < maxcolors; Color++){
+            if(IsValidColor(id,Color,colors)){
+                colors[id] = Color;
+                if(ColorVertex(id+1,maxcolors,colors)){
+                    return true;
+                }
+                colors[id] = std::numeric_limits<TVertexTag>::max();
+            }
+        }
         return false;
     }
 
+    bool ColorVertices(std::size_t maxcolors, bool keepcurrent, bool keepbest) noexcept{
+        std::vector<TVertexTag> Colors(DVertices.size(),std::numeric_limits<TVertexTag>::max());
+        if(keepcurrent){
+            for(std::size_t Index = 0; Index < DVertices.size(); Index++){
+                Colors[Index] = DVertices[Index].DTag < maxcolors ? DVertices[Index].DTag : std::numeric_limits<TVertexTag>::max();
+            }
+        }
+        if(ColorVertex(0, maxcolors, Colors)){
+            for(std::size_t Index = 0; Index < DVertices.size(); Index++){
+                DVertices[Index].DTag = Colors[Index];
+            }
+            return true;
+        }
+        return false;
+    }
+    
 };
 
 CAdjacencyListGraph::CAdjacencyListGraph(const std::vector<CGraph::TVertexTag>& tags,const std::vector<std::tuple<CGraph::TVertexID, CGraph::TVertexID, double, bool>>& edges){
