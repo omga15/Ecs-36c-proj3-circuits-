@@ -55,7 +55,16 @@ struct CCircuitLayer::SImplementation{
     // Adds a pin of the specified net name to location.
     // Returns true if the pin was successfully added.
     bool AddPin(const TCircuitName &name, const SCircuitLocation &location){
-        for(CCircuitNet &net : DNets){      // checks for name then addes the pin
+        for(const CCircuitNet &net : DNets){      // checks for duplicate pins
+            size_t Count = net.PinCount();
+            SCircuitLocation PinLocation;
+            for(size_t i = 0; i< Count; i++){
+                if(net.PinLocation(i,PinLocation) && PinLocation == location){
+                    return false;
+                }
+            }
+        }
+        for(CCircuitNet &net : DNets){ 
             if(net.Name() == name){
                 return net.AddPinLocation(location);
             }
@@ -111,6 +120,14 @@ struct CCircuitLayer::SImplementation{
                 {
                     if(net.PinLocation(i,location)){
                         DNet.AddPinLocation(location);
+                    }
+                }
+                CCircuitTrace trace;
+                Count = net.TraceCount();
+                for (size_t i = 0; i < Count; i++)
+                {
+                    if(net.Trace(i,trace)){
+                        DNet.AddTrace(trace);
                     }
                 }
                 return true;
