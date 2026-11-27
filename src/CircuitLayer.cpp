@@ -12,7 +12,7 @@ struct CCircuitLayer::SImplementation{
     // Returns the total number of pin locations in the layer.
     std::size_t PinCount() const{
         size_t numberPins = 0;
-        for(const CCircuitNet net : DNets){
+        for(const CCircuitNet &net : DNets){
             numberPins += net.PinCount();
         }
         return numberPins;
@@ -21,7 +21,7 @@ struct CCircuitLayer::SImplementation{
     // Gets the pin location at the specified index.
     // Returns true if the index is valid and the location was retrieved.
     bool PinLocation(std::size_t index, SCircuitLocation &location) const{
-            // TODO
+        // TODO
         (size_t) index; 
         for(const CCircuitNet &net : DNets){
             std::size_t Count = net.PinCount();
@@ -137,20 +137,62 @@ struct CCircuitLayer::SImplementation{
         return true;
     }
 
+    static bool SegmentsIntersect(const TCircuitCoordinate &x1, const TCircuitCoordinate &y1, const TCircuitCoordinate &x2, const TCircuitCoordinate &y2){
+    return std::max(std::min(x1, y1), std::min(x2, y2)) <=
+           std::min(std::max(x1, y1), std::max(x2, y2))
+        && std::max(std::min(x1, y1), std::min(x2, y2)) <=
+           std::min(std::max(x1, y1), std::max(x2, y2));
+    }
+
+    static bool Shorted(const CCircuitNet a, const CCircuitNet b){
+        SCircuitTraceEdge edgeA, edgeB; 
+        CCircuitTrace TraceA, TraceB;
+        for(size_t i = 0; i < a.TraceCount(); i++){
+            for(size_t j = 0; j < b.TraceCount(); j++){
+                a.Trace(i,TraceA), b.Trace(j,TraceB);
+                for (size_t k = 0; k < a.TraceCount(); k++){
+                    for(size_t l = 0; l < b.TraceCount(); l++){
+                        TraceA.Edge(k,edgeA);
+                        TraceB.Edge(l,edgeB);
+                        if(SegmentsIntersect(edgeA.DSource.DX,edgeA.DDestination.DY, edgeB.DSource.DX,edgeB.DDestination.DY)){
+                            return true;
+                        }
+                    }
+                }                
+            }
+        }
+        return false;
+    }
+
+
+
     // Gets all pairs of net names that are shorted together.
     // Returns true if at least one pair of nets is shorted together.
     bool GetShortedNets(std::vector<std::pair<TCircuitName,TCircuitName>> &nets) const{
-        // TODO
-        (void)nets;
-        return false;
+        size_t Count = DNets.size();
+        nets.clear();
+        for(size_t i = 0; i < Count; i++){
+            for(size_t j = i + 1; j < Count; j++){
+                if(Shorted(DNets[i],DNets[j])){
+                nets.push_back({DNets[i].Name(), DNets[j].Name()});
+                }
+            }
+        }
+        return !nets.empty();
     }
 
     // Gets all net names that are broken.
     // Returns true if at least one net is broken.
     bool GetBrokenNets(std::vector<TCircuitName> &nets) const{
         // TODO
-        (void)nets;
-        return false;
+        nets.clear();
+        for(const CCircuitNet DNet: DNets){
+            if(DNet.IsBroken()){
+                nets.push_back(DNet.Name());
+            }
+        }
+
+        return !nets.empty();
     }
 };
 

@@ -280,3 +280,74 @@ Send over the next method or function whenever you're ready!
 
 ### Changes/Comments 5
 Could be optimized further with a map, I used a vector of pairs to store the location/count. Also ended up creating some helper functions for this method as the implementation ended up repeating a bit.
+
+### Prompt 6 
+whats a way to code in cpp if any segments of lines of two points are crossing eachother? in a x and y cordinate 
+
+### Response 6
+
+#include <iostream>
+#include <algorithm>
+
+struct Point {
+    long long x, y;
+};
+
+// Returns orientation of ordered triplet (p, q, r):
+// 0 -> Collinear
+// 1 -> Clockwise
+// 2 -> Counterclockwise
+int orientation(Point p, Point q, Point r) {
+    long long val = (q.y - p.y) * (r.x - q.x) - (q.x - p.x) * (r.y - q.y);
+    if (val == 0) return 0;
+    return (val > 0) ? 1 : 2;
+}
+
+// Checks if point q lies on line segment pr (assuming p, q, r are collinear)
+bool onSegment(Point p, Point q, Point r) {
+    return q.x <= std::max(p.x, r.x) && q.x >= std::min(p.x, r.x) &&
+           q.y <= std::max(p.y, r.y) && q.y >= std::min(p.y, r.y);
+}
+
+// Returns true if segment p1q1 and segment p2q2 intersect
+bool doIntersect(Point p1, Point q1, Point p2, Point q2) {
+    int o1 = orientation(p1, q1, p2);
+    int o2 = orientation(p1, q1, q2);
+    int o3 = orientation(p2, q2, p1);
+    int o4 = orientation(p2, q2, q1);
+
+    // General case: segments straddle each other
+    if (o1 != o2 && o3 != o4)
+        return true;
+
+    // Special cases: collinear points lying on the other segment
+    if (o1 == 0 && onSegment(p1, p2, q1)) return true;
+    if (o2 == 0 && onSegment(p1, q2, q1)) return true;
+    if (o3 == 0 && onSegment(p2, p1, q2)) return true;
+    if (o4 == 0 && onSegment(p2, q1, q2)) return true;
+
+    return false;
+}
+
+int main() {
+    Point p1 = {1, 1}, q1 = {10, 1};
+    Point p2 = {1, 2}, q2 = {10, 2};
+    std::cout << (doIntersect(p1, q1, p2, q2) ? "Yes\n" : "No\n"); // No
+
+    p1 = {10, 0}; q1 = {0, 10};
+    p2 = {0, 0};  q2 = {10, 10};
+    std::cout << (doIntersect(p1, q1, p2, q2) ? "Yes\n" : "No\n"); // Yes
+
+    return 0;
+}
+
+### Changes/Coments 6
+
+Used to help make segment intersect 
+
+
+# Template
+### Prompt _
+### Response _
+### Changes/Coments _
+
